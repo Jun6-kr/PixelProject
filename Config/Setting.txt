@@ -1,0 +1,15 @@
+framerate = 120
+width = 285
+height = 165
+
+# SCREEN
+CameraWidth = 285
+CameraHeight = 165
+
+# PLAYER
+Width=24
+Height=18
+MoveSpeed=20
+JumpSpeed=25
+Gravity=100
+MaxFallSpeed=30

@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="DebugSystem/DebugSystem.vcxproj" Id="4244af73-602c-4a1e-bebe-589b60340428" />
+  <Project Path="MegaMan/MegaMan.vcxproj" Id="e87ae8fe-59d3-4691-b6b9-3ccdc4fb8ace">
+    <BuildDependency Project="PixelEngine/PixelEngine.vcxproj" />
+  </Project>
+  <Project Path="PixelEngine/PixelEngine.vcxproj" Id="d4ce5578-6655-4161-8cf9-12c17808f89e">
+    <BuildDependency Project="DebugSystem/DebugSystem.vcxproj" />
+  </Project>
+</Solution>
