@@ -1,4 +1,6 @@
 #pragma once
+#include <Math/Vector2.h>
+#include <string>
 
 namespace Pixel
 {

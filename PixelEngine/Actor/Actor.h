@@ -23,7 +23,7 @@ namespace Pixel
 		// 게임 플레이 이벤트 함수
 		virtual void BeginPlay();
 		virtual void Tick(float deltaTime);
-		virtual void Draw(const Vector2& camStart = Vector2::Zero, const Vector2& camEnd = Vector2::Zero);
+		virtual void Draw(const Vector2& screenOffset = Vector2::Zero, const Vector2& screenEnd = Vector2::Zero);
 
 		// 충돌 이벤트 함수
 		virtual void OnCollision(const std::shared_ptr<Actor>& other);
@@ -45,12 +45,12 @@ namespace Pixel
 		inline void SetOwner(std::weak_ptr<Level> newOwner) { owner = newOwner; }
 
 		inline Vector2 GetPosition() const { return position; }
-		virtual void SetPosition(const Vector2& newPosition);
+		void SetPosition(const Vector2& newPosition);
 
 		inline Vector2 GetPreviousPosition() const { return previousPosition; }
 		inline void SavePreviousState() { previousPosition = position; }
 
-		Pixel::Rect virtual GetBounds() const;
+		Pixel::Rect virtual GetBounds() const = 0;
 		inline ActorType GetActorType() const { return actorType; }
 
 	protected:

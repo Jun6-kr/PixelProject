@@ -72,7 +72,6 @@ namespace Pixel
 
 		// Getter
 		inline bool HasInitialized() const { return hasInitialized; }
-		inline int GetScreenOffset() const { return screenOffset; }
 
 
 	protected:
@@ -85,8 +84,6 @@ namespace Pixel
 	protected:
 		// 초기화 처리 여부 플래그
 		bool hasInitialized = false;
-
-		const int screenOffset = 10;
 
 		std::vector<std::string> levelData;
 

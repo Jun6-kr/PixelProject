@@ -7,7 +7,7 @@
 
 using namespace Pixel;
 
-Player::Player(const Vector2& position) : Actor(position)
+Player::Player(const Vector2& position) : Actor(position), posX(static_cast<float>(position.x)), posY(static_cast<float>(position.y))
 {
 	actorType = ActorType::Player;
 
@@ -49,8 +49,8 @@ Rect Player::GetBounds() const
 	//}
 
 	// TODO setting으로 처리?
-	int width = idleSprite[idleIndex]->GetSpriteWidth();
-	int height= idleSprite[idleIndex]->GetSpriteHeight();
+	int width = idleSprite[idleIndex]->GetSpriteWidth() - 1;
+	int height= idleSprite[idleIndex]->GetSpriteHeight() - 1;
 
 
 	return Rect(posX, posY, static_cast<float>(width), static_cast<float>(height));
@@ -118,6 +118,10 @@ void Player::Tick(float deltaTime)
 	newPosition.y = static_cast<int>(posY);
 
 	SetPosition(newPosition);
+	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
+	{
+		level->UpdateCamera(posX);
+	}
 
 	//int width = idleSprite[idleIndex]->GetSpriteWidth();
 	//int height = idleSprite[idleIndex]->GetSpriteHeight();
@@ -125,8 +129,10 @@ void Player::Tick(float deltaTime)
 	//JxDebug::DebugSystem::Get().AddBox(box);
 }
 
-void Player::Draw(const Vector2& camStart, const Vector2& camEnd)
+void Player::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 {
+	Vector2 pos = position - screenOffset;
+
 	switch (actorState)
 	{
 	case State::Idle:
@@ -140,7 +146,7 @@ void Player::Draw(const Vector2& camStart, const Vector2& camEnd)
 			idleIndex = 0;
 		}
 
-		idleSprite[idleIndex]->Draw(position, camStart, camEnd);
+		idleSprite[idleIndex]->Draw(pos, screenEnd);
 		idleIndex++;
 		idleIndex %= idleSprite.size();
 		break;
@@ -155,7 +161,7 @@ void Player::Draw(const Vector2& camStart, const Vector2& camEnd)
 			runningIndex = 0;
 		}
 
-		runningSprite[runningIndex]->Draw(position, camStart, camEnd);
+		runningSprite[runningIndex]->Draw(pos, screenEnd);
 		runningIndex++;
 		runningIndex %= runningSprite.size();
 		break;
@@ -163,17 +169,6 @@ void Player::Draw(const Vector2& camStart, const Vector2& camEnd)
 		break;
 	case State::Attack:
 		break;
-	}
-}
-
-void Player::SetPosition(const Vector2& newPosition)
-{
-	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
-	{
-		if (level->UpdatePlayerPos(newPosition))
-		{
-			super::SetPosition(newPosition);
-		}
 	}
 }
 

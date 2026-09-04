@@ -1,5 +1,5 @@
 #pragma once
-#include <Actor\Actor.h>
+#include <Actor/Actor.h>
 #include <Physics/Collision.h>
 #include <vector>
 
@@ -33,9 +33,7 @@ public:
 
 private:
 	virtual void Tick(float deltaTime) override;
-	virtual void Draw(const Pixel::Vector2& camStart, const Pixel::Vector2& camEnd) override;
-
-	virtual void SetPosition(const Pixel::Vector2& newPosition) override;
+	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
 
 	void ProcessInput(float direction, float deltaTime);
 
@@ -56,10 +54,10 @@ private:
 	float posX = 0.f;
 	float posY = 0.f;
 
-	const float moveSpeed = 30.f;
+	const float moveSpeed = 45.f;
 
 	bool isJumping = false;
-	const float jumpSpeed = 24.5f;
+	const float jumpSpeed = 50.0f;
 	float velocityY = 0.f;
 	float gravity = 50.0f;
 };

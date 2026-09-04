@@ -1,12 +1,26 @@
 ﻿#include "TitleLevel.h"
-#include <Util/Util.h>
+#include <Input/Input.h>
+//#include <Util/Util.h>
 #include <Render/Renderer.h>
 
 using namespace Pixel;
 
 TitleLevel::TitleLevel()
 {
-	Util::LoadTextFile("../Assets/Title.txt", levelData);
+	Util::LoadTextFile("../Assets/Title/Title.txt", levelData);
+
+	//menuList.emplace_back(std::make_unique<MenuItem>(""));
+}
+
+void TitleLevel::Tick(float deltaTime)
+{
+	super::Tick(deltaTime);
+
+	// 메뉴 선택
+	if (Input::Get().GetKeyDown(VK_RETURN))
+	{
+
+	}
 }
 
 void TitleLevel::Draw()

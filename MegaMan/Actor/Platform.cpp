@@ -9,7 +9,7 @@ Platform::Platform(const Vector2& position, int tileCountX) : Actor(position), t
 
 	for (int ix = 0; ix < tileCountX; ++ix)
 	{
-		sprites.emplace_back(new Sprite("../Assets/Platform/Tile_01.txt", actorType));
+		sprites.emplace_back(new Sprite("../Assets/Actors/Platform/Basic/Tile_01.txt", actorType));
 	}
 
 	width = sprites[0]->GetSpriteWidth() * tileCountX;
@@ -33,15 +33,15 @@ Rect Platform::GetBounds() const
 		, static_cast<float>(height));
 }
 
-void Platform::Draw(const Vector2& camStart, const Vector2& camEnd)
+void Platform::Draw(const Vector2& camOffset, const Vector2& camEnd)
 {
 	int preSpriteWidth = 0;
+	Vector2 pos = position - camOffset;
 
 	for (Sprite*& sprite : sprites)
 	{
-		Vector2 pos = position;
 		pos.x += preSpriteWidth;
-		sprite->Draw(pos, camStart, camEnd);
+		sprite->Draw(pos, camEnd);
 
 		preSpriteWidth = sprite->GetSpriteWidth();
 	}

@@ -1,5 +1,4 @@
 #include "GameManager.h"
-#include <Input/Input.h>
 #include <Level/TitleLevel.h>
 #include <Level/StageSelectLevel.h>
 #include <Level/GameLevel.h>
@@ -9,7 +8,12 @@ GameManager::GameManager()
 	menuList.emplace_back(std::make_shared<TitleLevel>());
 	menuList.emplace_back(std::make_shared<StageSelectLevel>());
 
-	mainLevel = menuList[static_cast<int>(menuIndex)];
+	mainLevel = menuList[static_cast<int>(/*menuIndex*/1)];
+
+	//binder.Bind("", [this]()
+	//	{
+	//		StartSelectedLevel
+	//	});
 }
 
 void GameManager::ShowSelectedLevel()
@@ -28,5 +32,9 @@ void GameManager::StartSelectedLevel(const std::string& levelName)
 }
 
 void GameManager::TogglePauseMenu()
+{
+}
+
+void GameManager::BackToTitle()
 {
 }

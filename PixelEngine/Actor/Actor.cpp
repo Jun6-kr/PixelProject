@@ -53,8 +53,4 @@ namespace Pixel
 
 		position = newPosition;
 	}
-	Rect Actor::GetBounds() const
-	{
-		return Rect();
-	}
 }

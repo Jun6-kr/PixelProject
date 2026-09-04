@@ -162,6 +162,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Control\DebugCommander.h" />
     <ClInclude Include="Core\Debug.h" />
     <ClInclude Include="Observe\Observer.h" />
     <ClInclude Include="System\DebugSystem.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Visualization\IDebugDraw.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Control\DebugCommander.cpp" />
     <ClCompile Include="Observe\Observer.cpp" />
     <ClCompile Include="System\DebugSystem.cpp" />
   </ItemGroup>

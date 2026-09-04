@@ -1,10 +1,14 @@
 #include "StageSelectLevel.h"
+#include <Input/Input.h>
 #include <Game/GameManager.h>
 #include <fileSystem>
+
+using namespace Pixel;
 
 StageSelectLevel::StageSelectLevel()
 {
 	LoadStageData();
+	currentStageIndex = 0;
 }
 
 void StageSelectLevel::LoadStageData()
@@ -29,5 +33,15 @@ void StageSelectLevel::SelectLevel()
 	std::string stageFolderPath = stageList[stageNames[currentStageIndex]];
 
 	GameManager& game = dynamic_cast<GameManager&>(Pixel::Engine::Get());
-	game.StartSelectedLevel(stageFolderPath);
+	game.StartSelectedLevel(stageFolderPath + "/" + stageNames[currentStageIndex]);
+}
+
+void StageSelectLevel::Tick(float deltaTime)
+{
+	super::Tick(deltaTime);
+
+	if (Input::Get().GetKeyDown(VK_SPACE))
+	{
+		SelectLevel();
+	}
 }

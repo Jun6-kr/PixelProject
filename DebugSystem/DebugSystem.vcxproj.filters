@@ -30,12 +30,18 @@
     <ClInclude Include="Visualization\Figure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Control\DebugCommander.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Observe\Observer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="System\DebugSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\DebugCommander.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,4 +1,4 @@
-#include "Sprite.h"
+﻿#include "Sprite.h"
 #include <Util/Util.h>
 #include <Render/Renderer.h>
 
@@ -9,25 +9,37 @@ Sprite::Sprite(const std::string& path, ActorType type) : actorType(type)
 	Util::LoadTextFile(path, sprite);
 }
 
-void Sprite::Draw(const Vector2& position, const Vector2& startPos, const Vector2& endPos)
+void Sprite::Draw(const Vector2& startPos, const Vector2& boundary)
 {
-	Vector2 pos = position;
-	 
+	int xPos = startPos.x;
+	int yPos = startPos.y;
+	
 	for (const std::string& str : sprite)
 	{
-		pos.x = position.x;
+		xPos = startPos.x;
+
+		// 시작 지점이 화면을 넘어가면 그리지 않는다.
+		if (yPos < 0 || yPos > boundary.y)
+		{
+			yPos += 1;
+			continue;
+		}
 
 		for (const char ch : str)
 		{
-			if (startPos.x <= pos.x && startPos.y <= pos.y && pos.x <= endPos.x && pos.y <= endPos.y)
+			// 시작 지점이 화면을 넘어가면 그리지 않는다.
+			if (xPos < 0 || xPos > boundary.x)
 			{
-				Renderer::Get().Submit(" ", pos, (ch != '*') ? ch : 0xFF, static_cast<int>(actorType));
+				xPos += 1;
+				continue;
 			}
 
-			pos.x += 1;
+			Renderer::Get().Submit(" ", Vector2(xPos, yPos), (ch != '*') ? ch : 0xFF, static_cast<int>(actorType));
+		
+			xPos += 1;
 		}
 
-		pos.y += 1;
+		yPos += 1;
 	}
 }
 

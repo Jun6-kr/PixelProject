@@ -14,6 +14,9 @@ public:
 	void SelectLevel();
 
 private:
+	virtual void Tick(float deltaTime) override;
+
+private:
 	int currentStageIndex = 0;
 	std::vector<std::string> stageNames;
 	std::unordered_map<std::string, std::string> stageList;

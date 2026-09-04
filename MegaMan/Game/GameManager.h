@@ -1,41 +1,17 @@
 ﻿#pragma once
+#include "DebugCommandBinder.h"
 #include <Engine\Engine.h>
-#include <Actor/ActorType.h>
 #include <string>
 #include <vector>
-
-struct ActorSpawnData
-{
-	Pixel::ActorType actorType = Pixel::ActorType::None;
-	std::string actorName = "";
-	Pixel::Vector2 position = Pixel::Vector2::Zero;
-	int tileXCount = 0;
-};
-
-struct StageConfig
-{
-	int stageWidth = 0;
-	int stageHeight = 0;
-	Pixel::Vector2 PlayerSpawnPos = Pixel::Vector2::Zero;
-};
-
-struct StageData
-{
-	std::vector<std::string> background;
-	std::vector<ActorSpawnData> actors;
-	StageConfig config;
-};
-
 
 enum class MenuState
 {
 	Title = 0,
 	Select,
-	Pause,
 	InGame,
+	Pause,
 	Result
 };
-
 
 class GameManager : public Pixel::Engine
 {
@@ -51,4 +27,6 @@ private:
 	MenuState menuIndex = MenuState::Title;
 	std::vector<std::shared_ptr<Pixel::Level>> menuList;
 
+	// Debug
+	DebugCommandBinder binder;
 };
