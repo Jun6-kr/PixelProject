@@ -70,20 +70,21 @@ namespace Pixel
 		cbi.ColorTable[3] = RGB(58, 110, 180);		// Mega man Body
 		cbi.ColorTable[4] = RGB(100, 160, 215);		// Mega man Body Highlight
 
-		cbi.ColorTable[5] = RGB(18, 26, 45);		// DarkBlue
-		cbi.ColorTable[6] = RGB(225, 205, 125);		// Yellow
-		cbi.ColorTable[7] = RGB(91, 68, 52);		// Brown
-		cbi.ColorTable[8] = RGB(111, 153, 164);		// LightCyan
-		cbi.ColorTable[9] = RGB(58, 66, 75);		// DarkGary
-		cbi.ColorTable[10] = RGB(64, 114, 76);		// LightGreen
-		cbi.ColorTable[11] = RGB(110, 112, 116);	// Gray
-		cbi.ColorTable[12] = RGB(210, 65, 90);		// Wine
+		cbi.ColorTable[5] = RGB(225, 250, 170);	// Rock Buster
 
+		cbi.ColorTable[6] = RGB(90, 150, 225);		// 배경 하늘색
+		cbi.ColorTable[7] = RGB(111, 153, 164);		// 구름 그림자색
+		cbi.ColorTable[8] = RGB(64, 114, 76);		// 구름 하이라이트
 
+		cbi.ColorTable[9] = RGB(210, 65, 90);		// Platform Wine
+
+		cbi.ColorTable[10] = RGB(58, 66, 75);		// 
+		cbi.ColorTable[11] = RGB(64, 114, 76);		// 
+		cbi.ColorTable[12] = RGB(110, 112, 116);	// 
 
 		cbi.ColorTable[13] = RGB(225, 95, 35);		// 
 		cbi.ColorTable[14] = RGB(0, 255, 0);		// 
-
+		 
 		int windowWidth = cbi.srWindow.Right - cbi.srWindow.Left + 1;
 		int windowHeight = cbi.srWindow.Bottom - cbi.srWindow.Top + 1;
 		OutputDebugStringA(("[" + std::to_string(windowWidth) + ", " + std::to_string(windowHeight) + "]" + "\n").c_str());

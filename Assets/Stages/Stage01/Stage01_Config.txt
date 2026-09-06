@@ -1,0 +1,7 @@
+[Stage Size]
+width = 1120
+height = 180
+
+[Player Start]
+x = 80
+y = 10

@@ -1,59 +1,61 @@
 ﻿#include "Player.h"
 #include <Input/Input.h>
 #include <Render/Sprite.h>
+#include <Render/AnimationClip.h>
 #include <Level/GameLevel.h>
-#include <Debug/DebugAdapter.h>
-#include <System/DebugSystem.h>
+
+//#include <Debug/DebugAdapter.h>
+//#include <System/DebugSystem.h>
 
 using namespace Pixel;
+
+Player::Player()
+{
+	actorType = ActorType::Player;
+	blockMask = 0b00001;
+	damageMask = 0b10100;
+}
 
 Player::Player(const Vector2& position) : Actor(position), posX(static_cast<float>(position.x)), posY(static_cast<float>(position.y))
 {
 	actorType = ActorType::Player;
-
-	idleSprite.emplace_back(new Sprite("../Assets/Player/Idle/Idle_1.txt", actorType));
-
-
-	runningSprite.emplace_back(new Sprite("../Assets/Player/Forward/Forward_1.txt", actorType));
-	runningSprite.emplace_back(new Sprite("../Assets/Player/Forward/Forward_2.txt", actorType));
-	runningSprite.emplace_back(new Sprite("../Assets/Player/Forward/Forward_3.txt", actorType));
 }
 
 Player::~Player()
 {
-	for (Sprite* spr : idleSprite)
+}
+
+void Player::SetAnimationClip(State state, const Pixel::AnimationClip* clip)
+{
+	switch (state)
 	{
-		delete spr;
-		spr = nullptr;
-	}
-	for (Sprite* spr : runningSprite)
-	{
-		delete spr;
-		spr = nullptr;
+	case State::Idle:
+		idleAnimtaion = clip;
+		break;
+	case State::Move:
+		moveAnimation = clip;
+		break;
+	case State::Jump:
+		jumpAnimation = clip;
+		break;
+	case State::Attack:
+		attackAnimation = clip;
+		break;
+	case State::JumpAttack:
+		jumpAttackAnimation = clip;
 	}
 }
 
-Rect Player::GetBounds() const
+void Player::UpdateFloatPosition(const Pixel::Vector2& position)
 {
-	//Rect rect = { };
-	//switch (state)
-	//{
-	//case State::Idle:
-	//	break;
-	//case State::Run:
-	//	break;
-	//case State::Jump:
-	//	break;
-	//case State::Attack:
-	//	break;
-	//}
+	SetPosition(position);
+	posX = static_cast<float>(position.x);
+	posY = static_cast<float>(position.y);
+}
 
-	// TODO setting으로 처리?
-	int width = idleSprite[idleIndex]->GetSpriteWidth() - 1;
-	int height= idleSprite[idleIndex]->GetSpriteHeight() - 1;
-
-
-	return Rect(posX, posY, static_cast<float>(width), static_cast<float>(height));
+void Player::BeginPlay()
+{
+	super::BeginPlay();
 }
 
 void Player::Tick(float deltaTime)
@@ -69,30 +71,72 @@ void Player::Tick(float deltaTime)
 
 	if (Input::Get().GetKey(VK_LEFT))
 	{
-		UpdateState(State::Run);
+		isForward = false;
+
+		if (currentState != State::Jump && currentState != State::JumpAttack && currentState != State::Attack)
+		{
+			UpdateState(State::Move);
+		}
 		moveX -= moveSpeed * deltaTime;
 	}
 	else if (Input::Get().GetKeyUp(VK_LEFT))
 	{
-		UpdateState(State::Idle);
+		if (currentState != State::Jump && currentState != State::JumpAttack)
+		{
+			UpdateState(prevState);
+		}
 	}
 
 	if (Input::Get().GetKey(VK_RIGHT))
 	{
-		UpdateState(State::Run);
+		isForward = true;
+
+		if (currentState != State::Jump && currentState != State::JumpAttack)
+		{
+			UpdateState(State::Move);
+		}
 		moveX += moveSpeed * deltaTime;
 	}
 	else if (Input::Get().GetKeyUp(VK_RIGHT))
 	{
-		UpdateState(State::Idle);
+		if (currentState != State::Jump && currentState != State::JumpAttack)
+		{
+			UpdateState(prevState);
+		}
 	}
 
 	// 점프
-	if (Input::Get().GetKeyDown(VK_SPACE) && !isJumping)
+	if (Input::Get().GetKeyDown(VK_UP) && currentState != State::Jump && currentState != State::JumpAttack)
 	{
-		isJumping = true;
+		UpdateState(State::Jump);
 		velocityY -= jumpSpeed;
 		standingPlatform.reset();
+	}
+
+	if (Input::Get().GetKeyDown(VK_SPACE))
+	{
+		if (currentState == State::Jump || currentState == State::JumpAttack)
+		{
+			UpdateState(State::JumpAttack);
+		}
+		else
+		{
+			UpdateState(State::Attack);
+		}
+
+		if (shootElapsed > shootInterval)
+		{
+			shootElapsed = 0;
+			ShootRockBuster();
+		}
+		else
+		{
+			shootElapsed += deltaTime;
+		}
+	}
+	else if (Input::Get().GetKeyUp(VK_SPACE))
+	{
+		UpdateState(prevState);
 	}
 
 	velocityY += gravity * deltaTime;
@@ -110,7 +154,10 @@ void Player::Tick(float deltaTime)
 	else
 	{
 		velocityY = 0;
-		isJumping = false;
+		if (currentState == State::Jump || currentState == State::JumpAttack)
+		{
+			UpdateState(State::Idle);
+		}
 	}
 
 	Vector2 newPosition = GetPosition();
@@ -133,81 +180,33 @@ void Player::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 {
 	Vector2 pos = position - screenOffset;
 
-	switch (actorState)
+	switch (currentState)
 	{
 	case State::Idle:
-		if (idleSprite.empty())
-		{
-			return;
-		}
-
-		if (idleIndex > idleSprite.size())
+		if (idleIndex >= idleAnimtaion->GetSize())
 		{
 			idleIndex = 0;
 		}
-
-		idleSprite[idleIndex]->Draw(pos, screenEnd);
-		idleIndex++;
-		idleIndex %= idleSprite.size();
+		idleAnimtaion->PlayAnimation(idleIndex, pos, screenEnd);
+		++idleIndex;
 		break;
-	case State::Run:
-		if (runningSprite.empty())
+	case State::Move:
+		if (moveIndex >= moveAnimation->GetSize())
 		{
-			return;
+			moveIndex = 0;
 		}
-
-		if (runningIndex > runningSprite.size())
-		{
-			runningIndex = 0;
-		}
-
-		runningSprite[runningIndex]->Draw(pos, screenEnd);
-		runningIndex++;
-		runningIndex %= runningSprite.size();
+		moveAnimation->PlayAnimation(moveIndex, pos, screenEnd);
+		++moveIndex;
 		break;
 	case State::Jump:
+		jumpAnimation->PlayAnimation(0, pos, screenEnd);
 		break;
 	case State::Attack:
+		attackAnimation->PlayAnimation(attackIndex, pos, screenEnd);
 		break;
-	}
-}
-
-void Player::ProcessInput(float direction, float deltaTime)
-{
-	if (Input::Get().GetKey(VK_LEFT))
-	{
-		UpdateState(State::Run);
-
-		float amount = direction * moveSpeed * deltaTime;
-		float newPosX = posX + amount;
-
-		Vector2 newPosition = GetPosition();
-		newPosition.x -= 2;
-
-		if (newPosition.x < 0)
-		{
-			newPosition.x = 0;
-		}
-
-		SetPosition(newPosition);
-	}
-	else if (Input::Get().GetKeyUp(VK_LEFT))
-	{
-		UpdateState(State::Idle);
-	}
-
-	if (Input::Get().GetKey(VK_RIGHT))
-	{
-		UpdateState(State::Run);
-
-		Vector2 newPosition = GetPosition();
-		newPosition.x += 2;
-
-		SetPosition(newPosition);
-	}
-	else if (Input::Get().GetKeyUp(VK_RIGHT))
-	{
-		UpdateState(State::Idle);
+	case State::JumpAttack:
+		jumpAttackAnimation->PlayAnimation(0, pos, screenEnd);
+		break;
 	}
 }
 
@@ -223,25 +222,16 @@ bool Player::CanMove(float toX, float toY)
 	rect.left += toX;
 	rect.height += toY;
 
-	CollisionResult result = level->CheckCollision(rect);
-	if (result.hasCollision)
-	{
-		ResolveCollision(result);
-		return !result.isBlocked;
-	}
-
-	return true;
+	// Damage 계산은 Enemy / Bullet 쪽에서
+	CollisionResult result = level->CheckCollision(this, rect);
+	return !result.isBlocked;
 }
 
-void Player::ResolveCollision(CollisionResult result)
+void Player::ShootRockBuster()
 {
-	switch(result.actor.lock()->GetActorType())
+	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
 	{
-	case ActorType::Bullet:
-	case ActorType::Enemy:
-		break;
-	case ActorType::Terrain:
-		standingPlatform = result.actor;
-		break;
+		// 20, 11에서만 발사
+		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(20, 9), /*isForward*/true);
 	}
 }

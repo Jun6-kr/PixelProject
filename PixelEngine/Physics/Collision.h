@@ -24,7 +24,7 @@ namespace Pixel
 
 	struct CollisionResult
 	{
-		bool hasCollision = false;
+		bool isDamaged = false;
 		bool isBlocked = false;
 
 		std::weak_ptr<Actor> actor;

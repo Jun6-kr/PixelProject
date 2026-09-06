@@ -36,7 +36,7 @@ namespace Pixel
 		// 콜리전 시스템 객체 생성
 		collisionSystem = std::make_unique<CollisionSystem>();
 
-		debugAdapter = std::make_unique<DebugAdapter>();
+		//debugAdapter = std::make_unique<DebugAdapter>();
 	}
 
 	Engine::~Engine()
@@ -138,7 +138,7 @@ namespace Pixel
 				prev = current;
 
 
-				DebugSystem::Get().Draw(debugAdapter.get());
+				//DebugSystem::Get().Draw(debugAdapter.get());
 			}
 		}
 

@@ -159,11 +159,16 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\AStarBullet.cpp" />
+    <ClCompile Include="Actor\AStarEnemy.cpp" />
+    <ClCompile Include="Actor\Door.cpp" />
     <ClCompile Include="Actor\Player.cpp" />
-    <ClCompile Include="Actor\RockBuster.cpp" />
+    <ClCompile Include="Actor\Projectile.cpp" />
     <ClCompile Include="Game\DebugCommandBinder.cpp" />
     <ClCompile Include="Game\GameManager.cpp" />
     <ClCompile Include="Actor\HornObstacle.cpp" />
+    <ClCompile Include="Game\ProjectileManager.cpp" />
+    <ClCompile Include="Game\SpriteManager.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Level\StageSelectLevel.cpp" />
     <ClCompile Include="Level\TestLevel.cpp" />
@@ -172,11 +177,16 @@
     <ClCompile Include="Actor\Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\AStarBullet.h" />
+    <ClInclude Include="Actor\AStarEnemy.h" />
+    <ClInclude Include="Actor\Door.h" />
     <ClInclude Include="Actor\Player.h" />
-    <ClInclude Include="Actor\RockBuster.h" />
+    <ClInclude Include="Actor\Projectile.h" />
     <ClInclude Include="Game\DebugCommandBinder.h" />
     <ClInclude Include="Game\GameManager.h" />
     <ClInclude Include="Actor\HornObstacle.h" />
+    <ClInclude Include="Game\ProjectileManager.h" />
+    <ClInclude Include="Game\SpriteManager.h" />
     <ClInclude Include="Level\GameLevel.h" />
     <ClInclude Include="Level\LevelItem.h" />
     <ClInclude Include="Level\StageSelectLevel.h" />

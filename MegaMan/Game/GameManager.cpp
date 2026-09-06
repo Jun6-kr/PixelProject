@@ -2,9 +2,21 @@
 #include <Level/TitleLevel.h>
 #include <Level/StageSelectLevel.h>
 #include <Level/GameLevel.h>
+#include <Util/Util.h>
+
+using namespace Pixel;
 
 GameManager::GameManager()
 {
+	player = std::make_shared<Player>();
+
+	player->SetAnimationClip(State::Idle, spriteManager.GetClip("Idle"));
+	player->SetAnimationClip(State::Move, spriteManager.GetClip("Move"));
+	player->SetAnimationClip(State::Attack, spriteManager.GetClip("Attack"));
+	player->SetAnimationClip(State::Jump, spriteManager.GetClip("Jump"));
+	player->SetAnimationClip(State::JumpAttack, spriteManager.GetClip("JumpAttack"));
+
+
 	menuList.emplace_back(std::make_shared<TitleLevel>());
 	menuList.emplace_back(std::make_shared<StageSelectLevel>());
 
@@ -27,8 +39,10 @@ void GameManager::ShowSelectedLevel()
 void GameManager::StartSelectedLevel(const std::string& levelName)
 {
 	menuIndex = MenuState::InGame;
-	menuList.emplace_back(std::make_shared<GameLevel>(levelName));
+	auto game = std::make_shared<GameLevel>(levelName, player);
+	menuList.emplace_back(game);
 	mainLevel = menuList[static_cast<int>(menuIndex)];
+	player->SetOwner(game);
 }
 
 void GameManager::TogglePauseMenu()
@@ -37,4 +51,9 @@ void GameManager::TogglePauseMenu()
 
 void GameManager::BackToTitle()
 {
+}
+
+const Pixel::AnimationClip* GameManager::GetClip(const std::string& key)
+{
+	return spriteManager.GetClip(key);
 }

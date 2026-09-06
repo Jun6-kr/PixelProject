@@ -9,7 +9,7 @@ Sprite::Sprite(const std::string& path, ActorType type) : actorType(type)
 	Util::LoadTextFile(path, sprite);
 }
 
-void Sprite::Draw(const Vector2& startPos, const Vector2& boundary)
+void Sprite::Draw(const Vector2& startPos, const Vector2& boundary) const
 {
 	int xPos = startPos.x;
 	int yPos = startPos.y;

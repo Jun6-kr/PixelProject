@@ -6,6 +6,7 @@
 namespace Pixel
 {
 	class Sprite;
+	class AnimationClip;
 }
 
 class Platform;
@@ -13,9 +14,10 @@ class Platform;
 enum class State
 {
 	Idle = 0,
-	Run,
-	Attack,
-	Jump,
+	Move = 0b0001,
+	Attack = 0b0010,
+	Jump = 0b0100,
+	JumpAttack = Attack | Jump,
 };
 
 class Player : public Pixel::Actor
@@ -24,32 +26,59 @@ class Player : public Pixel::Actor
 	TYPE_DECLARATIONS(Player, Actor)
 
 public:
+	Player();
 	Player(const Pixel::Vector2& position);
 	~Player();
 
-	inline void UpdateState(State newState) { actorState = newState; }
+	inline void UpdateState(State newState)
+	{ 
+		if (currentState == newState)
+		{
+			return;
+		}
 
-	virtual Pixel::Rect GetBounds() const override;
+		prevState = currentState;
+		currentState = newState;
+	}
+	void SetAnimationClip(State state, const Pixel::AnimationClip* clip);
+
+	virtual Pixel::Rect GetBounds() const override
+	{
+		return Pixel::Rect(posX, posY, 20.0f, 20.0f);
+	};
+
+	void UpdateFloatPosition(const Pixel::Vector2& position);
 
 private:
+	virtual void BeginPlay() override;
 	virtual void Tick(float deltaTime) override;
 	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
 
-	void ProcessInput(float direction, float deltaTime);
-
 	bool CanMove(float toX, float toY);
-	void ResolveCollision(Pixel::CollisionResult result);
+
+	void ShootRockBuster();
 
 private:
-	State actorState = State::Idle;
+	State currentState = State::Idle;
+	State prevState = State::Idle;
 
 	int idleIndex = 0;
-	std::vector<Pixel::Sprite*> idleSprite;
-	int runningIndex = 0;
-	std::vector<Pixel::Sprite*> runningSprite;
+	const Pixel::AnimationClip* idleAnimtaion = nullptr;
+
+	int moveIndex = 0;
+	const Pixel::AnimationClip* moveAnimation = nullptr;
+
+	const Pixel::AnimationClip* jumpAnimation = nullptr;
+
+	const Pixel::AnimationClip* jumpAttackAnimation = nullptr;
+
+	int attackIndex = 0;
+	const Pixel::AnimationClip* attackAnimation = nullptr;
 
 	bool enableInput = true;
 	std::weak_ptr<Actor> standingPlatform;
+
+	bool isForward = true;
 
 	float posX = 0.f;
 	float posY = 0.f;
@@ -60,5 +89,8 @@ private:
 	const float jumpSpeed = 50.0f;
 	float velocityY = 0.f;
 	float gravity = 50.0f;
+
+	const float shootInterval = 0.01f;
+	float shootElapsed = 10.0f;
 };
 

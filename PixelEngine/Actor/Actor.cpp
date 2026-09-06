@@ -53,4 +53,6 @@ namespace Pixel
 
 		position = newPosition;
 	}
+	void Actor::OnDamaged(const int damage)
+	{}
 }

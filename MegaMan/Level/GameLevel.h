@@ -1,15 +1,10 @@
 ﻿#pragma once
 #include <Level\Level.h>
+#include <Game/ProjectileManager.h>
 #include <Math/Rect.h>
 #include <Physics/Collision.h>
 //#include <unordered_map>
 #include <Game/DebugCommandBinder.h>
-
-//struct ActorDefinition
-//{
-//	std::string actorId = "";
-//	std::vector<std::vector<Pixel::Sprite*>> sprites;
-//};
 
 struct ActorSpawnData
 {
@@ -31,17 +26,27 @@ struct StageData
 	StageConfig config;
 };
 
+class Player;
 
 class GameLevel : public Pixel::Level
 {
 	TYPE_DECLARATIONS(GameLevel, Level)
 
 public:
-	GameLevel(const std::string& path);
+	GameLevel(const std::string& path, std::shared_ptr<Player> player);
+
+	void SpawnPlayer(std::shared_ptr<Player> player);
 
 	void UpdateCamera(float playerWorldX);
 
-	Pixel::CollisionResult CheckCollision(Pixel::Rect rect);
+	Pixel::CollisionResult CheckCollision(const Pixel::Actor* requester, Pixel::Rect rect);
+
+	void ShootProjectile(ProjectileType type, const Pixel::Vector2& position, bool isForward);
+
+	inline int& GetScreenOffsetX() { return screenOffsetX; }
+	inline int& GetScreenOffsetY() { return screenOffsetY; }
+	inline int& GetScreenWidth() { return camEnd.x; }
+	inline int& GetScreenHeight() { return camEnd.y; }
 
 protected:
 	virtual void OnInitialized() override;
@@ -54,10 +59,11 @@ private:
 	void LoadLevelConfig(const std::string& configPath);
 	
 	void LoadActorList(const std::string& actorPath);
-	//std::vector<Pixel::Sprite*> GetSprite(const std::string& spritePath);
 	void LoadLevelActorData(const std::string& actorPath);
 	
 	void SpawnActorWithData(const ActorSpawnData & data);
+
+	void SpawnProjectilePool();
 
 	void SoftReset();
 	void TeleportBoss();
@@ -65,7 +71,8 @@ private:
 
 private:
 	StageData stageData;
-	//std::unordered_map<std::string, ActorDefinition> actorDefinitions;
+
+	ProjectileManager projectileManager;
 
 	DebugCommandBinder binder;
 

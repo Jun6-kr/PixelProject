@@ -6,6 +6,8 @@ using namespace Pixel;
 Platform::Platform(const Vector2& position, int tileCountX) : Actor(position), tileCountX(tileCountX)
 {
 	actorType = ActorType::Terrain;
+	blockMask = 0b11010;
+	damageMask = 0b00000;
 
 	for (int ix = 0; ix < tileCountX; ++ix)
 	{

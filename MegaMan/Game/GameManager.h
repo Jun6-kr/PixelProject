@@ -1,6 +1,8 @@
 ﻿#pragma once
+#include "SpriteManager.h"
 #include "DebugCommandBinder.h"
 #include <Engine\Engine.h>
+#include <Actor/Player.h>
 #include <string>
 #include <vector>
 
@@ -13,6 +15,11 @@ enum class MenuState
 	Result
 };
 
+namespace Pixel
+{
+	class AnimationClip;
+}
+
 class GameManager : public Pixel::Engine
 {
 public:
@@ -23,9 +30,15 @@ public:
 	void TogglePauseMenu();
 	void BackToTitle();
 
+	const Pixel::AnimationClip* GetClip(const std::string& key);
+
+
 private:
 	MenuState menuIndex = MenuState::Title;
 	std::vector<std::shared_ptr<Pixel::Level>> menuList;
+
+	SpriteManager spriteManager;
+	std::shared_ptr<Player> player;
 
 	// Debug
 	DebugCommandBinder binder;

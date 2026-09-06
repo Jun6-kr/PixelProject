@@ -12,7 +12,7 @@ namespace Pixel
 	public:
 		Sprite(const std::string& path, ActorType type);
 
-		void Draw(const Vector2& startPos, const Vector2& boundary);
+		void Draw(const Vector2& startPos, const Vector2& boundary) const;
 
 		std::vector<std::string>& GetSprite() { return sprite; }
 

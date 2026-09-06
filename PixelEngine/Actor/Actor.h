@@ -38,6 +38,7 @@ namespace Pixel
 		// Getter/Setter
 		inline bool HasBeganPlay() const { return hasBeganPlay; }
 		inline bool IsActive() const { return isActive && !hasExpired; }
+		inline void SetActive(bool active) { isActive = active; }
 		inline bool HasExpired() const { return hasExpired; }
 
 		// 
@@ -52,6 +53,11 @@ namespace Pixel
 
 		Pixel::Rect virtual GetBounds() const = 0;
 		inline ActorType GetActorType() const { return actorType; }
+
+		virtual void OnDamaged(const int damage);
+
+		inline uint32_t GetBlockMask() const { return blockMask; }
+		inline uint32_t GetDamageMask() const { return damageMask; }
 
 	protected:
 		// BeginPlay 이벤트 처리 여부 플래그
@@ -74,6 +80,9 @@ namespace Pixel
 		Vector2 previousPosition;
 
 		ActorType actorType = ActorType::None;
+
+		uint32_t blockMask = 0;
+		uint32_t damageMask = 0;
 	};
 }
 
