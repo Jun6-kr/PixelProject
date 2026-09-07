@@ -1,5 +1,6 @@
 #include "Platform.h"
-#include <Render/Sprite.h>
+#include <Game/GameManager.h>
+#include <Render/AnimationClip.h>
 
 using namespace Pixel;
 
@@ -9,22 +10,15 @@ Platform::Platform(const Vector2& position, int tileCountX) : Actor(position), t
 	blockMask = 0b11010;
 	damageMask = 0b00000;
 
-	for (int ix = 0; ix < tileCountX; ++ix)
-	{
-		sprites.emplace_back(new Sprite("../Assets/Actors/Platform/Basic/Tile_01.txt", actorType));
-	}
+	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+	idleAnimtaion = game.GetClip("Platform");
 
-	width = sprites[0]->GetSpriteWidth() * tileCountX;
-	height = sprites[0]->GetSpriteHeight();
+	width = idleAnimtaion->GetWidth() * tileCountX;
+	height = idleAnimtaion->GetHeight();
 }
 
 Platform::~Platform()
 {
-	for (Sprite*& sprite : sprites)
-	{
-		delete sprite;
-		sprite = nullptr;
-	}
 }
 
 Rect Platform::GetBounds() const
@@ -37,14 +31,11 @@ Rect Platform::GetBounds() const
 
 void Platform::Draw(const Vector2& camOffset, const Vector2& camEnd)
 {
-	int preSpriteWidth = 0;
 	Vector2 pos = position - camOffset;
 
-	for (Sprite*& sprite : sprites)
+	for (int ix = 0; ix < tileCountX; ++ix)
 	{
-		pos.x += preSpriteWidth;
-		sprite->Draw(pos, camEnd);
-
-		preSpriteWidth = sprite->GetSpriteWidth();
+		idleAnimtaion->PlayAnimation(0, pos, camEnd);
+		pos.x += idleAnimtaion->GetWidth();
 	}
 }

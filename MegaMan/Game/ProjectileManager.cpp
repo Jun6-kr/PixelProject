@@ -45,25 +45,30 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 	projectileDefinitions[type] = def;
 }
 
-void ProjectileManager::RegisterProjectilePool(const std::shared_ptr<Projectile>& projectile)
+void ProjectileManager::RegisterProjectilePool(ProjectileType type, const std::shared_ptr<Projectile>& projectile)
 {
-	pool.emplace_back(projectile.get());
+	typePool[type].emplace_back(projectile.get());
 }
 
-void ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, bool isForward)
+void ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level)
 {
 	Projectile* projectile = nullptr;
 
-	for (int ix = 0; ix < pool.size(); ++ix)
+	if (typePool[type].empty())
 	{
-		if (!(pool[ix]->IsActive()))
+		return;
+	}
+	 
+ 	for (int ix = 0; ix < typePool[type].size(); ++ix)
+	{
+		if (!(typePool[type][ix]->IsActive()))
 		{
-			projectile = pool[ix];
+			projectile = typePool[type][ix];
 			break;
 		}
 	}
 
 	ProjectileDefination def = projectileDefinitions[type];
-	projectile->SetProjectileInfo(def, position, isForward ? Vector2(1, 0) : Vector2(-1, 0));
+	projectile->SetProjectileInfo(def, position, direction, level);
 	projectile->SetActive(true);
 }

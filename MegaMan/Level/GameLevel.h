@@ -3,7 +3,7 @@
 #include <Game/ProjectileManager.h>
 #include <Math/Rect.h>
 #include <Physics/Collision.h>
-//#include <unordered_map>
+#include <unordered_set>
 #include <Game/DebugCommandBinder.h>
 
 struct ActorSpawnData
@@ -26,6 +26,11 @@ struct StageData
 	StageConfig config;
 };
 
+namespace Pixel
+{
+	class Actor;
+}
+
 class Player;
 
 class GameLevel : public Pixel::Level
@@ -33,7 +38,9 @@ class GameLevel : public Pixel::Level
 	TYPE_DECLARATIONS(GameLevel, Level)
 
 public:
-	GameLevel(const std::string& path, std::shared_ptr<Player> player);
+	GameLevel();
+
+	void SetInitData(const std::string& path, std::shared_ptr<Player> player);
 
 	void SpawnPlayer(std::shared_ptr<Player> player);
 
@@ -41,12 +48,14 @@ public:
 
 	Pixel::CollisionResult CheckCollision(const Pixel::Actor* requester, Pixel::Rect rect);
 
-	void ShootProjectile(ProjectileType type, const Pixel::Vector2& position, bool isForward);
+	void ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction);
 
 	inline int& GetScreenOffsetX() { return screenOffsetX; }
 	inline int& GetScreenOffsetY() { return screenOffsetY; }
 	inline int& GetScreenWidth() { return camEnd.x; }
 	inline int& GetScreenHeight() { return camEnd.y; }
+
+	std::unordered_set<Pixel::Vector2>& GetBlocked() { return blockedPosition; }
 
 protected:
 	virtual void OnInitialized() override;
@@ -59,8 +68,8 @@ private:
 	void LoadLevelConfig(const std::string& configPath);
 	
 	void LoadActorList(const std::string& actorPath);
-	void LoadLevelActorData(const std::string& actorPath);
-	
+	void SetBlockedLocation(const Pixel::Actor* spawned);
+
 	void SpawnActorWithData(const ActorSpawnData & data);
 
 	void SpawnProjectilePool();
@@ -71,6 +80,8 @@ private:
 
 private:
 	StageData stageData;
+
+	std::unordered_set<Pixel::Vector2> blockedPosition;
 
 	ProjectileManager projectileManager;
 

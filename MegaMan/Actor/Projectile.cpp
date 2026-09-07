@@ -1,20 +1,40 @@
 #include "Projectile.h"
 #include <Physics/Collision.h>
+//#include <System/DebugSystem.h>
 #include <Level/GameLevel.h>
 
 using namespace Pixel;
 
 Projectile::Projectile()
 {
+	actorType = ActorType::Bullet;
 }
 
-void Projectile::SetProjectileInfo(ProjectileDefination definition, const Pixel::Vector2& position, const Pixel::Vector2& direction)
+void Projectile::OnSpawn(GameLevel* level)
+{
+}
+
+void Projectile::SetProjectileInfo(ProjectileDefination definition, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level)
 {
 	projectileDef = definition;
+
 	SetPosition(position);
 	posX = static_cast<float>(position.x);
 	posY = static_cast<float>(position.y);
+
+	width = projectileDef.width;
+	height = projectileDef.height;
+
 	this->direction = direction;
+
+	animation = projectileDef.animation;
+
+	OnSpawn(level);
+}
+
+Rect Projectile::GetBounds() const
+{
+	return Rect(posX, posY, static_cast<float>(width), static_cast<float>(height));
 }
 
 void Projectile::Tick(float deltaTime)
@@ -40,7 +60,6 @@ void Projectile::Tick(float deltaTime)
 	newPosition.y = static_cast<int>(posY);
 
 	SetPosition(newPosition);
-	
 }
 
 void Projectile::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
@@ -59,11 +78,10 @@ void Projectile::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 		return;
 	}
 
-	projectileDef.animation->PlayAnimation(animIndex, pos, screenEnd);
-	++animIndex;
-}
+	//int width = animation->GetWidth();
+	//int height = animation->GetSize();
+	//JxDebug::DebugSystem::Get().AddBox(position.x, position.y, width, height, 0x0D);
 
-Rect Projectile::GetBounds() const
-{
-	return Rect(posX, posY, static_cast<float>(projectileDef.width), static_cast<float>(projectileDef.height));
+	animation->PlayAnimation(animIndex, pos, screenEnd);
+	++animIndex;
 }

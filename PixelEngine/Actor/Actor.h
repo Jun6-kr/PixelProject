@@ -59,6 +59,9 @@ namespace Pixel
 		inline uint32_t GetBlockMask() const { return blockMask; }
 		inline uint32_t GetDamageMask() const { return damageMask; }
 
+		inline int GetWidth() const { return width; }
+		inline int GetHeight() const { return height; }
+
 	protected:
 		// BeginPlay 이벤트 처리 여부 플래그
 		bool hasBeganPlay = false;
@@ -79,10 +82,14 @@ namespace Pixel
 		// 이전 프레임 위치
 		Vector2 previousPosition;
 
+		int width = 0;
+		int height = 0;
+
 		ActorType actorType = ActorType::None;
 
 		uint32_t blockMask = 0;
 		uint32_t damageMask = 0;
+
+		int HP = 0;
 	};
 }
-

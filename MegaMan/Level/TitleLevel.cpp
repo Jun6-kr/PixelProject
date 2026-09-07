@@ -1,7 +1,7 @@
 ﻿#include "TitleLevel.h"
 #include <Input/Input.h>
-//#include <Util/Util.h>
 #include <Render/Renderer.h>
+#include <Game/GameManager.h>
 
 using namespace Pixel;
 
@@ -9,7 +9,11 @@ TitleLevel::TitleLevel()
 {
 	Util::LoadTextFile("../Assets/Title/Title.txt", levelData);
 
-	//menuList.emplace_back(std::make_unique<MenuItem>(""));
+	pressStart = std::make_unique<MenuItem>("../Assets/Title/PressStart.txt", []()
+		{
+			GameManager& game = dynamic_cast<GameManager&>(Pixel::Engine::Get());
+			game.ShowSelectedLevel();
+		});
 }
 
 void TitleLevel::Tick(float deltaTime)
@@ -17,9 +21,9 @@ void TitleLevel::Tick(float deltaTime)
 	super::Tick(deltaTime);
 
 	// 메뉴 선택
-	if (Input::Get().GetKeyDown(VK_RETURN))
+	if (Input::Get().GetKeyDown(VK_SPACE) || Input::Get().GetKeyDown(VK_RETURN))
 	{
-
+		pressStart->onSelected();
 	}
 }
 
@@ -34,5 +38,17 @@ void TitleLevel::Draw()
 			Renderer::Get().Submit(" ", Vector2(x, y), (ch != '*') ? ch : 0xFF);
 			++x;
 		}
+	}
+
+	int x = 45;
+	int y = 101;
+	for (const std::string& str : pressStart->menuText)
+	{
+		for (const char ch : str)
+		{
+			Renderer::Get().Submit(" ", Vector2(x, y), (ch != '*') ? ch : 0xFF);
+			++x;
+		}
+		++y;
 	}
 }

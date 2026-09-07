@@ -30,8 +30,11 @@ public:
 	void TogglePauseMenu();
 	void BackToTitle();
 
-	const Pixel::AnimationClip* GetClip(const std::string& key);
+	void FinishEffect(const Pixel::Vector2& position);
+	void FinishGame();
 
+	const Pixel::AnimationClip* GetClip(const std::string& key);
+	std::weak_ptr<Player> GetPlayer() const { return player; }
 
 private:
 	MenuState menuIndex = MenuState::Title;

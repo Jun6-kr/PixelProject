@@ -1,10 +1,9 @@
 #pragma once
 #include <Actor\Actor.h>
-#include <vector>
 
 namespace Pixel
 {
-	class Sprite;
+	class AnimationClip;
 }
 
 class Platform : public Pixel::Actor
@@ -21,9 +20,7 @@ private:
 	virtual void Draw(const Pixel::Vector2& camStart, const Pixel::Vector2& camEnd) override;
 	
 private:
-	std::vector<Pixel::Sprite*> sprites;
-	int width = 0;
-	int height = 0;
+	const Pixel::AnimationClip* idleAnimtaion = nullptr;
 	int tileCountX = 0;
 };
 

@@ -1,12 +1,5 @@
 # Type, X, Y, RepeatCount
-Platform,120,145,12
-#HornObstacle,165,141,1
-#Platform,205,136,2
-#HornObstacle,235,141,1
-#Platform,280,134,2
-#HornObstacle,310,129,1
-#Platform,355,133,2
-#HornObstacle,385,139,1
-#Platform,430,136,2
-#HornObstacle,460,139,1
-Platform,515,136,7
+Platform,120,145,5
+Platform,350,136,3
+AStarEnemy,350,130,1
+Airman,380,120,1

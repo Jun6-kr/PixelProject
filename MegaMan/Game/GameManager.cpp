@@ -20,7 +20,7 @@ GameManager::GameManager()
 	menuList.emplace_back(std::make_shared<TitleLevel>());
 	menuList.emplace_back(std::make_shared<StageSelectLevel>());
 
-	mainLevel = menuList[static_cast<int>(/*menuIndex*/1)];
+	mainLevel = menuList[static_cast<int>(menuIndex)];
 
 	//binder.Bind("", [this]()
 	//	{
@@ -32,14 +32,13 @@ void GameManager::ShowSelectedLevel()
 {
 	menuIndex = MenuState::Select;
 	nextLevel = menuList[static_cast<int>(menuIndex)];
-	auto select = std::static_pointer_cast<StageSelectLevel>(nextLevel);
-	
 }
 
 void GameManager::StartSelectedLevel(const std::string& levelName)
 {
 	menuIndex = MenuState::InGame;
-	auto game = std::make_shared<GameLevel>(levelName, player);
+	auto game = std::make_shared<GameLevel>();
+	game->SetInitData(levelName, player);
 	menuList.emplace_back(game);
 	mainLevel = menuList[static_cast<int>(menuIndex)];
 	player->SetOwner(game);
@@ -50,6 +49,16 @@ void GameManager::TogglePauseMenu()
 }
 
 void GameManager::BackToTitle()
+{
+	menuIndex = MenuState::Title;
+	mainLevel = menuList[static_cast<int>(menuIndex)];
+}
+
+void GameManager::FinishEffect(const Pixel::Vector2& position)
+{
+}
+
+void GameManager::FinishGame()
 {
 }
 

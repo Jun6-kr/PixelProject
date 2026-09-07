@@ -21,6 +21,7 @@ namespace JxDebug
 		void AddPoint(const DebugPoint& point);
 		void AddLine(const DebugLine& line);
 		void AddBox(const DebugBox& box);
+		void AddBox(const int x, const int y, const int width, const int height, const unsigned char colorIndex = 0x0E);
 
 		void Draw(IDebugDraw* adapter);
 

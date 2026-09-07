@@ -2,7 +2,9 @@
 #include <Game/GameManager.h>
 #include <Actor/Player.h>
 #include <Actor/Platform.h>
-#include <Actor/HornObstacle.h>
+#include <Actor/AStarEnemy.h>
+#include <Actor/AStarBullet.h>
+#include <Actor/Airman.h>
 
 #include <Util/Util.h>
 #include <Render/Renderer.h>
@@ -13,12 +15,13 @@
 using namespace Pixel;
 using namespace JxDebug;
 
-GameLevel::GameLevel(const std::string& path, std::shared_ptr<Player> player)
+GameLevel::GameLevel()
+{
+}
+
+void GameLevel::SetInitData(const std::string& path, std::shared_ptr<Player> player)
 {
 	LoadLevelData(path);
-
-	//stageData.config.stageWidth = static_cast<int>(levelData[0].length());
-	//stageData.config.stageHeight = static_cast<int>(levelData.size());
 
 	binder.Bind("soft reset", [this]()
 		{
@@ -82,20 +85,22 @@ CollisionResult GameLevel::CheckCollision(const Actor* requester, Rect rect)
 		if (actor->GetBlockMask() & typeMask)
 		{
 			result.isBlocked = true;
+			result.actor = actor;
 		}
 
 		if (actor->GetDamageMask() & typeMask)
 		{
 			result.isDamaged = true;
+			result.actor = actor;
 		}
 	}
 
 	return result;
 }
 
-void GameLevel::ShootProjectile(ProjectileType type, const Pixel::Vector2& position, bool isForward)
+void GameLevel::ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction)
 {
-	projectileManager.SpwnProjectile(type, position, isForward);
+	projectileManager.SpwnProjectile(type, position, direction, this);
 }
 
 void GameLevel::OnInitialized()
@@ -265,98 +270,6 @@ void GameLevel::LoadLevelConfig(const std::string& configPath)
 	stageData.config = config;
 }
 
-void GameLevel::LoadLevelActorData(const std::string& actorPath)
-{
-	std::vector<std::string> actors;
-	Util::LoadTextFile(actorPath, actors);
-	std::unordered_map<std::string, std::vector<std::string>> tempMap;
-	std::string id = "";
-	std::vector<std::string> sprites;
-
-	for (std::string line : actors)
-	{
-		if (line[0] == '#')
-		{
-			continue;
-		}
-
-		if (line.empty() && !sprites.empty())
-		{
-			tempMap[id] = sprites;
-			id = "";
-		}
-
-		if (line.front() == '[' && line.back() == ']')
-		{
-			id = line.substr(1, line.size() - 2);
-			continue;
-		}
-
-		if (id != "")
-		{
-			const size_t equalPosition = line.find('=');	// 문자열 내 = 위치 확인
-
-			auto trim = [](std::string& s)
-				{
-					const char* whiteSpace = " \t\r\n";
-
-					// 문자열의 앞에서부터 공백이 아닌 첫 문자 위치 검색
-					const size_t begin = s.find_first_not_of(whiteSpace);
-
-					// 공백이 아닌 문자를 못찾은 경우에는 빈 문자열로 설정 후 변환
-					if (begin == std::string::npos)
-					{
-						s.clear();
-						return;
-					}
-
-					// 문자열의 뒤에서부터 공백이 아닌 마지막 문자 위치 검색
-					const size_t end = s.find_last_not_of(whiteSpace);
-					s = s.substr(begin, end - begin + 1);
-				};
-
-			// key 파싱
-			std::string key = line.substr(0, equalPosition);
-
-			// value 파싱 - ' = ' 이후 전체
-			std::string value = line.substr(equalPosition + 1);
-
-			// 람다 호출로 key/value에서 공백 제거
-			trim(key);
-			trim(value);
-
-			if (key == "Sprite")
-			{
-				size_t start = 0, pos = 0;
-				std::string str;
-				while ((pos = value.find(',', start)) != std::string::npos)
-				{
-					str = value.substr(start, pos - start);
-					trim(str);
-					sprites.emplace_back(str);
-					start = pos + 1;
-				}
-
-				trim(str);
-				sprites.emplace_back(value.substr(start));
-			}
-		}
-	}
-
-	//for (const auto& [actorId, spriteIds] : tempMap)
-	//{
-	//	ActorDefinition def = { };
-	//	def.actorId = actorId;
-	//
-	//	for (const std::string& sprite : spriteIds)
-	//	{
-	//		std::string str = "../Assets/Actors/" + actorId + "/" + sprite;
-	//
-	//		def.sprites.emplace_back(GetSprite(sprite));
-	//	}
-	//}
-}
-
 void GameLevel::LoadActorList(const std::string& actorPath)
 {
 	std::vector<std::string> actors;
@@ -406,15 +319,45 @@ void GameLevel::LoadActorList(const std::string& actorPath)
 	}
 }
 
+void GameLevel::SetBlockedLocation(const Actor* spawned)
+{
+	Vector2 pos = spawned->GetPosition();
+	const int width = spawned->GetWidth();
+	const int height = spawned->GetHeight();
+
+	for (int jx = 0; jx < height; ++jx)
+	{
+		for (int ix = 0; ix < width; ++ix)
+		{
+			pos.x += ix;
+			blockedPosition.insert(pos);
+		}
+
+		pos.y += jx;
+	}
+}
+
 void GameLevel::SpawnActorWithData(const ActorSpawnData& data)
 {
+	Actor* spawned = nullptr;
+
 	if (data.actorId == "Platform")
 	{
-		SpawnActor<Platform>(data.position, data.tileCountX);
+		spawned = SpawnActor<Platform>(data.position, data.tileCountX).get();
+		//spawned->SetOwner(this);
 	}
-	else if (data.actorId == "HornObstacle")
+	else if (data.actorId == "AStarEnemy")
 	{
-		SpawnActor<HornObstacle>(data.position);
+		spawned = SpawnActor<AStarEnemy>(data.position).get();
+	}
+	else if (data.actorId == "Airman")
+	{
+		spawned = SpawnActor<Airman>(data.position).get();
+	}
+
+	if (spawned)
+	{
+		SetBlockedLocation(spawned);
 	}
 }
 
@@ -424,7 +367,13 @@ void GameLevel::SpawnProjectilePool()
 	{
 		std::shared_ptr<Projectile> projectile = SpawnActor<Projectile>();
 		projectile->SetActive(false);
-		projectileManager.RegisterProjectilePool(projectile);
+		projectileManager.RegisterProjectilePool(ProjectileType::RockBuster, projectile);
+	}
+	for (int ix = 0; ix < 32; ++ix)
+	{
+		std::shared_ptr<Projectile> projectile = SpawnActor<AStarBullet>();
+		projectile->SetActive(false);
+		projectileManager.RegisterProjectilePool(ProjectileType::Astar, projectile);
 	}
 }
 

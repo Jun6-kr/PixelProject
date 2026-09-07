@@ -2,6 +2,7 @@
 
 #include <Core/Core.h>
 #include <Windows.h>
+#include <functional>
 
 namespace Pixel
 {
@@ -43,3 +44,15 @@ namespace Pixel
 	};
 }
 
+namespace std
+{
+	template<>
+	struct hash<Pixel::Vector2>
+	{
+		size_t operator()(const Pixel::Vector2& v) const noexcept
+		{
+			// x, y를 조합해서 해시값 생성 (간단한 예시)
+			return hash<int>()(v.x) ^ (hash<int>()(v.y) << 1);
+		}
+	};
+}

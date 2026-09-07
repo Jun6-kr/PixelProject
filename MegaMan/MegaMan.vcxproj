@@ -159,9 +159,11 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\Airman.cpp" />
     <ClCompile Include="Actor\AStarBullet.cpp" />
     <ClCompile Include="Actor\AStarEnemy.cpp" />
     <ClCompile Include="Actor\Door.cpp" />
+    <ClCompile Include="Actor\Enemy.cpp" />
     <ClCompile Include="Actor\Player.cpp" />
     <ClCompile Include="Actor\Projectile.cpp" />
     <ClCompile Include="Game\DebugCommandBinder.cpp" />
@@ -171,15 +173,16 @@
     <ClCompile Include="Game\SpriteManager.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Level\StageSelectLevel.cpp" />
-    <ClCompile Include="Level\TestLevel.cpp" />
     <ClCompile Include="Level\TitleLevel.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Actor\Platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\Airman.h" />
     <ClInclude Include="Actor\AStarBullet.h" />
     <ClInclude Include="Actor\AStarEnemy.h" />
     <ClInclude Include="Actor\Door.h" />
+    <ClInclude Include="Actor\Enemy.h" />
     <ClInclude Include="Actor\Player.h" />
     <ClInclude Include="Actor\Projectile.h" />
     <ClInclude Include="Game\DebugCommandBinder.h" />
@@ -190,7 +193,6 @@
     <ClInclude Include="Level\GameLevel.h" />
     <ClInclude Include="Level\LevelItem.h" />
     <ClInclude Include="Level\StageSelectLevel.h" />
-    <ClInclude Include="Level\TestLevel.h" />
     <ClInclude Include="Actor\Platform.h" />
     <ClInclude Include="Level\TitleLevel.h" />
   </ItemGroup>

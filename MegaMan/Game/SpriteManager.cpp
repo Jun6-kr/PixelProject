@@ -38,6 +38,29 @@ void SpriteManager::LoadDefaultSprite()
 	playerSpirtes["Jump"] = clip;
 	clip = {};
 
+	// Platform
+	clip.AddFrame(Sprite("../Assets/Actors/Platform/Basic/Tile_01.txt", ActorType::Enemy));
+	playerSpirtes["Platform"] = clip;
+	clip = {};
+
+	// Enemy
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/AStar/AStar.txt", ActorType::Enemy));
+	playerSpirtes["AStarEnemy"] = clip;
+	clip = {};
+	
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Idle/Airman.txt", ActorType::Enemy));
+	playerSpirtes["Airman_Idle"] = clip;
+	clip = {};
+	
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Attack/Airman1.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Attack/Airman2.txt", ActorType::Enemy));
+	playerSpirtes["Airman_Attack"] = clip;
+	clip = {};
+	
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Jump/Airman.txt", ActorType::Enemy));
+	playerSpirtes["Airman_Jump"] = clip;
+	clip = {};
+
 
 	// Bullet
 	clip.AddFrame(Sprite("../Assets/Bullets/RockBuster/RockBuster.txt", ActorType::RockBuster));

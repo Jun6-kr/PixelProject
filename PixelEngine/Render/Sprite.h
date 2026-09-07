@@ -16,7 +16,7 @@ namespace Pixel
 
 		std::vector<std::string>& GetSprite() { return sprite; }
 
-		int GetSpriteWidth();
+		int GetSpriteWidth() const;
 		int GetSpriteHeight() const { return static_cast<int>(sprite.size()); }
 
 	private:

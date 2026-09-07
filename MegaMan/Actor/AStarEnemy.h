@@ -1,23 +1,18 @@
 #pragma once
-#include <Actor/Actor.h>
+#include <Actor/Enemy.h>
 
-namespace Pixel
+class AStarEnemy : public Enemy
 {
-	class AnimationClip;
-}
-
-class AStarEnemy : public Pixel::Actor
-{
-	TYPE_DECLARATIONS(AStarEnemy, Actor)
+	TYPE_DECLARATIONS(AStarEnemy, Enemy)
 
 public:
-	AStarEnemy();
+	AStarEnemy(const Pixel::Vector2& position = Pixel::Vector2::Zero);
+
+	virtual Pixel::Rect GetBounds() const override;
 
 private:
 	virtual void Tick(float deltaTime) override;
 	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
 
-private:
-	const Pixel::AnimationClip* idleAnimtaion = nullptr;
+	void ShootAStar();
 };
-

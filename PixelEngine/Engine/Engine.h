@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Core/Core.h>
-//#include <Debug/DebugAdapter.h>
+#include <Debug/DebugAdapter.h>
 
 #include <memory>	// 스마트 포인터 사용을 위한 추가
 
@@ -115,7 +115,7 @@ namespace Pixel
 		std::unique_ptr<CollisionSystem> collisionSystem;
 
 		// 디버거
-		//std::unique_ptr<DebugAdapter> debugAdapter;
+		std::unique_ptr<DebugAdapter> debugAdapter;
 	};
 }
 

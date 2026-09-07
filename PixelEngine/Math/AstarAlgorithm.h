@@ -1,6 +1,9 @@
-#pragma once
-#include "Math/Vector2.h"
+﻿#pragma once
 #include <Core/Core.h>
+#include "Math/Vector2.h"
+#include <Debug/DebugAdapter.h>
+#include <vector>
+#include <unordered_set>
 
 namespace Pixel
 {
@@ -15,11 +18,89 @@ namespace Pixel
 		Vector2 position;
 
 		// 노드의 비용 정보
-		float gCost = 0.0f;		// 현 노드까지 누적 이동 비용 
-		float hCost = 0.0f;		// 휴리스틱, 도착지 까지의 예상 비용
-		float fCost = 0.0f;
+		int gCost = 0;		// 현 노드까지 누적 이동 비용 
+		int hCost = 0;		// 휴리스틱, 도착지 까지의 예상 비용
+		int fCost = 0;
 
 		// 최종 경로를 역추적할 때 사용할 부모 노드
 		Node* parent = nullptr;
+	};
+
+	class PIXEL_API AstarAlgorithm
+	{
+	private:
+		// 이동 방향과 해당 방향의 이동 비용
+		struct Direction
+		{
+			int x = 0;
+			int y = 0;
+			int cost = 0;
+		};
+
+		// 그리드 타일의 종류 (열거형)
+		enum class TileType : char
+		{
+			Ground = 0,
+			Wall = 1,
+			Start = 2,
+			Goal = 3,
+			Visited = 5,
+		};
+
+	public:
+		std::vector<Vector2> FindPath(const Vector2& start, const Vector2& goal, const std::unordered_set<Vector2>& blocked);
+
+		void GetScreenWorldPosition(const Vector2& screenStartPos, int screenOffsetX, int screenOffsetY)
+		{
+			worldStartPosition = screenStartPos;
+			worldBoundary.x = screenStartPos.x + screenOffsetX;
+			worldBoundary.y = screenStartPos.y + screenOffsetY;
+		}
+
+		// 탐색한 최종 경로를 출력하는 함수
+		//void DisplayGridWithPath(std::vector<std::vector<int>>& grid, const std::vector<Pixel::Vector2>& path);
+
+	private:
+		// 이전 탐색에 사용한 정보 및 노드를 정리하는 함수
+		void Clear();
+
+		// 노드 생성 전문 함수
+		Node* CreateNode(const Vector2& position, Node* parent = nullptr);
+
+		// 부모 노드를 역추적해서 경로를 구성하는 함수
+		std::vector<Vector2> ConstructPath(Node* destination);
+
+		// 휴리스틱(추정 비용) 계산 함수
+		int CalculateHeuristic(const Vector2& current, const Vector2& goal) const;
+
+		// Open / Close 목록 검사 함수
+		bool IsInClosedList(int x, int y) const;
+		Node* FindOpenNode(int x, int y) const;
+
+		bool IsInRange(int x, int y) const;
+
+		// 이전 탐색 표시를 지우고 그리드를 출력하는 함수
+		//void ClearVisualization(std::vector<std::vector<int>>& grid) const;
+		//void DisplayGrid(std::vector<std::vector<int>>& grid) const;
+
+	private:
+		Vector2 worldStartPosition;
+		Vector2 worldBoundary;
+		
+		// 동적 할당된 모든 노드를 소유하는 목록 -> 소멸자에서 전체 동적할당 노드 메모리 해제시 사용
+		std::vector<Pixel::Node*> allocatedNodes;
+
+		// 탐색할 노드 목록
+		std::vector<Pixel::Node*> openList;
+		std::unordered_map<Pixel::Vector2, Pixel::Node*> openMap;
+		
+		// //탐색을 마친 노드 목록
+		std::unordered_set<Pixel::Vector2> closedSet;
+
+		// 시작/목표 노드
+		Pixel::Node* startNode = nullptr;
+		Pixel::Node* goalNode = nullptr;
+
+		DebugAdapter deebug;
 	};
 }

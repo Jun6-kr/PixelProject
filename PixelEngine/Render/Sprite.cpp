@@ -43,7 +43,7 @@ void Sprite::Draw(const Vector2& startPos, const Vector2& boundary) const
 	}
 }
 
-int Sprite::GetSpriteWidth()
+int Sprite::GetSpriteWidth() const
 {
 	if (sprite.empty())
 	{

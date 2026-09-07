@@ -2,7 +2,7 @@
 
 using namespace JxDebug;
 
-DebugSystem& JxDebug::DebugSystem::Get()
+DebugSystem& DebugSystem::Get()
 {
 	static DebugSystem instance;
 	return instance;
@@ -23,9 +23,21 @@ void DebugSystem::AddBox(const DebugBox& box)
 	boxes.emplace_back(box);
 }
 
+void DebugSystem::AddBox(const int x, const int y, const int width, const int height, const unsigned char colorIndex)
+{
+	DebugBox box = {};
+	box.position.x = static_cast<float>(x);
+	box.position.y = static_cast<float>(y);
+
+	box.size = DebugPoint(static_cast<float>(width), static_cast<float>(height));
+	box.colorIndex = colorIndex;
+
+	boxes.emplace_back(box);
+}
+
 void DebugSystem::Draw(IDebugDraw* adapter)
 {
-	if (!isDebugMode)
+ 	if (!isDebugMode)
 		return;
 
 	for (const DebugPoint& point : points)
@@ -40,7 +52,7 @@ void DebugSystem::Draw(IDebugDraw* adapter)
 
 	for (const DebugBox& point : boxes)
 	{
-		adapter->Draw2DBox(point);
+		adapter->Draw2DBox(point, point.colorIndex);
 	}
 }
 

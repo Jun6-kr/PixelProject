@@ -1,4 +1,5 @@
 #include "AnimationClip.h"
+#include <System/DebugSystem.h>
 
 namespace Pixel
 {
@@ -21,6 +22,8 @@ namespace Pixel
 		{
 			return;
 		}
+
+		JxDebug::DebugSystem::Get().AddBox(screenPos.x, screenPos.y, GetWidth(), GetHeight());
 
 		sprites[index].Draw(screenPos, boundary);
 	}

@@ -1,24 +1,31 @@
 ﻿#include "Player.h"
 #include <Input/Input.h>
-#include <Render/Sprite.h>
 #include <Render/AnimationClip.h>
 #include <Level/GameLevel.h>
-
-//#include <Debug/DebugAdapter.h>
-//#include <System/DebugSystem.h>
 
 using namespace Pixel;
 
 Player::Player()
 {
+	width = 20;
+	height = 20;
+
 	actorType = ActorType::Player;
 	blockMask = 0b00001;
 	damageMask = 0b10100;
+	HP = 28;
 }
 
-Player::Player(const Vector2& position) : Actor(position), posX(static_cast<float>(position.x)), posY(static_cast<float>(position.y))
+Player::Player(const Vector2& position)
+	: Actor(position), posX(static_cast<float>(position.x)), posY(static_cast<float>(position.y))
 {
+	width = 20;
+	height = 20;
+
 	actorType = ActorType::Player;
+	blockMask = 0b00001;
+	damageMask = 0b10100;
+	HP = 28;
 }
 
 Player::~Player()
@@ -169,11 +176,6 @@ void Player::Tick(float deltaTime)
 	{
 		level->UpdateCamera(posX);
 	}
-
-	//int width = idleSprite[idleIndex]->GetSpriteWidth();
-	//int height = idleSprite[idleIndex]->GetSpriteHeight();
-	//JxDebug::DebugBox box = DebugAdapter::Get().MakeDebugBox(position, width, height);
-	//JxDebug::DebugSystem::Get().AddBox(box);
 }
 
 void Player::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
@@ -232,6 +234,6 @@ void Player::ShootRockBuster()
 	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
 	{
 		// 20, 11에서만 발사
-		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(20, 9), /*isForward*/true);
+		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(20, 9), Vector2(1, 0));
 	}
 }

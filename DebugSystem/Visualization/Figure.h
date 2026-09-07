@@ -18,5 +18,7 @@ namespace JxDebug
 	{
 		DebugPoint position;
 		DebugPoint size;
+
+		unsigned char colorIndex;
 	};
 }

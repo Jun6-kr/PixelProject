@@ -18,6 +18,8 @@ struct ProjectileDefination
 	uint32_t damageMask = 0;
 };
 
+class GameLevel;
+
 class Projectile : public Pixel::Actor
 {
 	TYPE_DECLARATIONS(Projectile, Actor)
@@ -25,15 +27,16 @@ class Projectile : public Pixel::Actor
 public:
 	Projectile();
 
-	void SetProjectileInfo(ProjectileDefination definition, const Pixel::Vector2& position, const Pixel::Vector2& direction = Pixel::Vector2(1, 0));
-
-private:
-	virtual void Tick(float deltaTime) override;
-	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
+	virtual void OnSpawn(GameLevel* level);
+	void SetProjectileInfo(ProjectileDefination definition, const Pixel::Vector2& position, const Pixel::Vector2& direction = Pixel::Vector2(1, 0), GameLevel* level = nullptr);
 
 	virtual Pixel::Rect GetBounds() const;
 
-private:
+protected:
+	virtual void Tick(float deltaTime) override;
+	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
+
+protected:
 	ProjectileDefination projectileDef;
 	int animIndex = 0;
 

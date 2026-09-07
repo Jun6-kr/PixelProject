@@ -1,68 +1,78 @@
 #include "AStarBullet.h"
+#include <Level/GameLevel.h>
+#include <Game/GameManager.h>
+#include <Actor/Player.h>
+#include <System/DebugSystem.h>
 
 using namespace Pixel;
 
 AStarBullet::AStarBullet()
-{}
-
-std::vector<Vector2> AStarBullet::FindPath(const Vector2& startPosition, const Vector2& goalPosition, std::vector<std::vector<int>>& grid)
 {
-    return std::vector<Vector2>();
 }
 
-void AStarBullet::DisplayGridWithPath(std::vector<std::vector<int>>& grid, const std::vector<Vector2>& path)
-{}
-
-void AStarBullet::Clear()
-{}
-
-Node* AStarBullet::CreateNode(const Vector2 & position, Node * parent)
+void AStarBullet::OnSpawn(GameLevel* level)
 {
-    return nullptr;
+	if (!level)
+	{
+		return;
+	}
+
+	aStar.GetScreenWorldPosition(Vector2(level->GetScreenOffsetX(), level->GetScreenOffsetY())
+		, level->GetScreenWidth()
+		, level->GetScreenHeight());
+
+	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+	Player* player = game.GetPlayer().lock().get();
+	route = aStar.FindPath(position, player->GetPosition(), level->GetBlocked());
 }
 
-std::vector<Vector2> AStarBullet::ConstructPath(Node* destination)
+void AStarBullet::Tick(float deltaTime)
 {
-    return std::vector<Vector2>();
+	if (!isActive || route.empty())
+	{
+		return;
+	}
+
+	moveTimer += projectileDef.speed * deltaTime;
+
+	while (moveTimer >= 1.0f && astarIndex < route.size() - 1)
+	{
+		moveTimer -= 1.0f;
+		++astarIndex;
+
+		posX = static_cast<float>(route[astarIndex].x);
+		posY = static_cast<float>(route[astarIndex].y);
+
+		std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
+
+		CollisionResult result = level->CheckCollision(this, GetBounds());
+		if (result.isDamaged)
+		{
+			result.actor.lock()->OnDamaged(projectileDef.damage);
+			SetActive(false);
+			return;
+		}
+
+		Vector2 newPosition = GetPosition();
+		newPosition.x = route[astarIndex].x;
+		newPosition.y = route[astarIndex].y;
+		SetPosition(newPosition);
+	}
+
+	if (astarIndex >= route.size() - 1)
+	{
+		astarIndex = 0;
+		SetActive(false);
+		return;
+	}
 }
 
-float AStarBullet::CalculateHeuristic(const Vector2& current, const Vector2& goal) const
+void AStarBullet::Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd)
 {
-    return 0.0f;
+	super::Draw(screenOffset, screenEnd);
+
+	for (int ix = 0; ix < route.size(); ++ix)
+	{
+		JxDebug::DebugSystem::Get().AddBox(route[ix].x - screenOffset.x, route[ix].y - screenOffset.y, 1, 1, (ix < astarIndex) ? 0x0E : 0x0D);
+	}
 }
-
-bool AStarBullet::IsValidGrid(const std::vector<std::vector<int>>& grid) const
-{
-    return false;
-}
-
-bool AStarBullet::IsInRange(int x, int y, const std::vector<std::vector<int>>& grid) const
-{
-    return false;
-}
-
-bool AStarBullet::IsDiagonalBlocked(const Vector2& current, const Direction& direction, const std::vector<std::vector<int>>& grid) const
-{
-    return false;
-}
-
-Node* AStarBullet::FindOpenNode(int x, int y) const
-{
-    return nullptr;
-}
-
-bool AStarBullet::IsInClosedList(int x, int y) const
-{
-    return false;
-}
-
-bool AStarBullet::IsDestination(const Node* node) const
-{
-    return false;
-}
-
-void AStarBullet::ClearVisualization(std::vector<std::vector<int>>& grid) const
-{}
-
-void AStarBullet::DisplayGrid(std::vector<std::vector<int>>&grid) const
-{}

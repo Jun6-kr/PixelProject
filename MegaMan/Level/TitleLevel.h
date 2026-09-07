@@ -1,5 +1,5 @@
 #pragma once
-#include <Level\Level.h>
+#include <Level/Level.h>
 #include <Level/LevelItem.h>
 
 class TitleLevel : public Pixel::Level
@@ -16,6 +16,6 @@ private:
 
 private:
 	int currentMenuIndex = 0;
-	std::vector<std::unique_ptr<MenuItem>> menuList;
+	std::unique_ptr<MenuItem> pressStart;
 };
 

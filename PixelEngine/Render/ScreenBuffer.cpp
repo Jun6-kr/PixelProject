@@ -70,7 +70,7 @@ namespace Pixel
 		cbi.ColorTable[3] = RGB(58, 110, 180);		// Mega man Body
 		cbi.ColorTable[4] = RGB(100, 160, 215);		// Mega man Body Highlight
 
-		cbi.ColorTable[5] = RGB(225, 250, 170);	// Rock Buster
+		cbi.ColorTable[5] = RGB(225, 250, 170);		// Rock Buster
 
 		cbi.ColorTable[6] = RGB(90, 150, 225);		// 배경 하늘색
 		cbi.ColorTable[7] = RGB(111, 153, 164);		// 구름 그림자색
@@ -78,11 +78,11 @@ namespace Pixel
 
 		cbi.ColorTable[9] = RGB(210, 65, 90);		// Platform Wine
 
-		cbi.ColorTable[10] = RGB(58, 66, 75);		// 
-		cbi.ColorTable[11] = RGB(64, 114, 76);		// 
-		cbi.ColorTable[12] = RGB(110, 112, 116);	// 
+		cbi.ColorTable[10] = RGB(88, 99, 239);		// title blue
+		cbi.ColorTable[11] = RGB(243, 225, 77);		// ariman yellow 
+		cbi.ColorTable[12] = RGB(110, 112, 116);	// title gray
 
-		cbi.ColorTable[13] = RGB(225, 95, 35);		// 
+		cbi.ColorTable[13] = RGB(225, 0, 0);		// 
 		cbi.ColorTable[14] = RGB(0, 255, 0);		// 
 		 
 		int windowWidth = cbi.srWindow.Right - cbi.srWindow.Left + 1;

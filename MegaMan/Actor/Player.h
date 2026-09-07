@@ -1,7 +1,5 @@
 #pragma once
 #include <Actor/Actor.h>
-#include <Physics/Collision.h>
-#include <vector>
 
 namespace Pixel
 {
@@ -44,7 +42,7 @@ public:
 
 	virtual Pixel::Rect GetBounds() const override
 	{
-		return Pixel::Rect(posX, posY, 20.0f, 20.0f);
+		return Pixel::Rect(posX, posY, static_cast<float>(width), static_cast<float>(height));
 	};
 
 	void UpdateFloatPosition(const Pixel::Vector2& position);
