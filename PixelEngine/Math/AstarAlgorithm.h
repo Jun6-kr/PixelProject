@@ -57,9 +57,6 @@ namespace Pixel
 			worldBoundary.y = screenStartPos.y + screenOffsetY;
 		}
 
-		// 탐색한 최종 경로를 출력하는 함수
-		//void DisplayGridWithPath(std::vector<std::vector<int>>& grid, const std::vector<Pixel::Vector2>& path);
-
 	private:
 		// 이전 탐색에 사용한 정보 및 노드를 정리하는 함수
 		void Clear();
@@ -79,9 +76,7 @@ namespace Pixel
 
 		bool IsInRange(int x, int y) const;
 
-		// 이전 탐색 표시를 지우고 그리드를 출력하는 함수
-		//void ClearVisualization(std::vector<std::vector<int>>& grid) const;
-		//void DisplayGrid(std::vector<std::vector<int>>& grid) const;
+		const int GetIndexInOpenList(const Vector2& position);
 
 	private:
 		Vector2 worldStartPosition;

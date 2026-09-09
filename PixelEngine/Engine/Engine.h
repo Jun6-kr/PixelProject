@@ -12,7 +12,6 @@ namespace Pixel
 	class Level;
 	class Input;
 	class Renderer;
-	class CollisionSystem;
 
 	// 메인 엔진 클래스
 	// 엔진 루프 제공
@@ -70,7 +69,7 @@ namespace Pixel
 		void BeginPlay();
 
 		// 게임 플레이 업데이트 함수
-		void Tick(float deltaTime);
+		virtual void Tick(float deltaTime);
 
 		// 레벨 그리기 함수
 		void Draw();
@@ -110,9 +109,6 @@ namespace Pixel
 
 		// 렌더러
 		std::unique_ptr<Renderer> renderer;
-
-		// 충돌
-		std::unique_ptr<CollisionSystem> collisionSystem;
 
 		// 디버거
 		std::unique_ptr<DebugAdapter> debugAdapter;

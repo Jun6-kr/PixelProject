@@ -40,15 +40,15 @@ void TitleLevel::Draw()
 		}
 	}
 
-	int x = 45;
-	int y = 101;
-	for (const std::string& str : pressStart->menuText)
-	{
-		for (const char ch : str)
-		{
-			Renderer::Get().Submit(" ", Vector2(x, y), (ch != '*') ? ch : 0xFF);
-			++x;
-		}
-		++y;
-	}
+	//int x = 45;
+	//int y = 101;
+	//for (const std::string& str : pressStart->menuText)
+	//{
+	//	for (const char ch : str)
+	//	{
+	//		Renderer::Get().Submit(" ", Vector2(x, y), (ch != '*') ? ch : 0xFF);
+	//		++x;
+	//	}
+	//	++y;
+	//}
 }

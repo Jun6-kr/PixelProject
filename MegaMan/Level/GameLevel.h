@@ -1,16 +1,25 @@
 ﻿#pragma once
 #include <Level\Level.h>
+#include <HUD/GameHUD.h>
 #include <Game/ProjectileManager.h>
 #include <Math/Rect.h>
 #include <Physics/Collision.h>
 #include <unordered_set>
 #include <Game/DebugCommandBinder.h>
 
+enum class BossEntryState
+{
+	Stage,
+	EntryRoom,
+	BossRoom
+};
+
 struct ActorSpawnData
 {
 	std::string actorId = "";
 	Pixel::Vector2 position = Pixel::Vector2::Zero;
 	int tileCountX = 0;
+	int tileCountY = 0;
 };
 
 struct StageConfig
@@ -32,6 +41,7 @@ namespace Pixel
 }
 
 class Player;
+class Airman;
 
 class GameLevel : public Pixel::Level
 {
@@ -48,7 +58,7 @@ public:
 
 	Pixel::CollisionResult CheckCollision(const Pixel::Actor* requester, Pixel::Rect rect);
 
-	void ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction);
+	Projectile* ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction);
 
 	inline int& GetScreenOffsetX() { return screenOffsetX; }
 	inline int& GetScreenOffsetY() { return screenOffsetY; }
@@ -56,6 +66,9 @@ public:
 	inline int& GetScreenHeight() { return camEnd.y; }
 
 	std::unordered_set<Pixel::Vector2>& GetBlocked() { return blockedPosition; }
+
+	void EnterBossEntryRoom();
+	void EnterBossRoom();
 
 protected:
 	virtual void OnInitialized() override;
@@ -72,6 +85,8 @@ private:
 
 	void SpawnActorWithData(const ActorSpawnData & data);
 
+	void UpdateCameraTransition(float deltaTime);
+
 	void SpawnProjectilePool();
 
 	void SoftReset();
@@ -80,10 +95,24 @@ private:
 
 private:
 	StageData stageData;
+	ProjectileManager projectileManager;
+	GameHUD hud;
+
 
 	std::unordered_set<Pixel::Vector2> blockedPosition;
 
-	ProjectileManager projectileManager;
+
+	bool isDoorTransition = false;
+	BossEntryState bossEntryState = BossEntryState::Stage;
+	int screenTargetX = 0;
+	const float transitionSpeed = 100.f;
+
+	int screenXMax = 0;
+
+	const int entryRoomCameraX = 570 + 18;
+	const int bossRoomCameraX = 835 + 18;
+
+	Airman* boss = nullptr;
 
 	DebugCommandBinder binder;
 

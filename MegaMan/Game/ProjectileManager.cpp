@@ -9,6 +9,7 @@ ProjectileManager::ProjectileManager()
 void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixel::AnimationClip* animation)
 {
 	ProjectileDefination def = {};
+	def.type = type;
 
 	switch (type)
 	{
@@ -18,8 +19,8 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.speed = 100;
 		def.width = 7;
 		def.height = 5;
-		def.blockMask = 0b00101;
-		def.damageMask = 0b00100;
+		def.blockMask = 0b01110;
+		def.damageMask = 0b01000;
 		break;
 	case ProjectileType::Astar:
 		def.damage = 2;
@@ -28,7 +29,7 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.width = 7;
 		def.height = 5;
 		def.blockMask = 0b01011;
-		def.damageMask = 0b00010;
+		def.damageMask = 0b10000;
 		break;
 	case ProjectileType::AirShooter:
 		def.damage = 4;
@@ -36,8 +37,8 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.speed = 80;
 		def.width = 7;
 		def.height = 5;
-		def.blockMask = 0b10000;
-		def.damageMask = 0b00010;
+		def.blockMask = 0b00100;
+		def.damageMask = 0b10000;
 		break;
 	}
 
@@ -50,13 +51,13 @@ void ProjectileManager::RegisterProjectilePool(ProjectileType type, const std::s
 	typePool[type].emplace_back(projectile.get());
 }
 
-void ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level)
+Projectile* ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level)
 {
 	Projectile* projectile = nullptr;
 
 	if (typePool[type].empty())
 	{
-		return;
+		return nullptr;
 	}
 	 
  	for (int ix = 0; ix < typePool[type].size(); ++ix)
@@ -71,4 +72,6 @@ void ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::Vector2
 	ProjectileDefination def = projectileDefinitions[type];
 	projectile->SetProjectileInfo(def, position, direction, level);
 	projectile->SetActive(true);
+
+	return projectile;
 }

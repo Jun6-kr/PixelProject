@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor\Airman.cpp" />
+    <ClCompile Include="Actor\AirShooter.cpp" />
     <ClCompile Include="Actor\AStarBullet.cpp" />
     <ClCompile Include="Actor\AStarEnemy.cpp" />
     <ClCompile Include="Actor\Door.cpp" />
@@ -168,9 +169,9 @@
     <ClCompile Include="Actor\Projectile.cpp" />
     <ClCompile Include="Game\DebugCommandBinder.cpp" />
     <ClCompile Include="Game\GameManager.cpp" />
-    <ClCompile Include="Actor\HornObstacle.cpp" />
     <ClCompile Include="Game\ProjectileManager.cpp" />
     <ClCompile Include="Game\SpriteManager.cpp" />
+    <ClCompile Include="HUD\GameHUD.cpp" />
     <ClCompile Include="Level\GameLevel.cpp" />
     <ClCompile Include="Level\StageSelectLevel.cpp" />
     <ClCompile Include="Level\TitleLevel.cpp" />
@@ -179,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\Airman.h" />
+    <ClInclude Include="Actor\AirShooter.h" />
     <ClInclude Include="Actor\AStarBullet.h" />
     <ClInclude Include="Actor\AStarEnemy.h" />
     <ClInclude Include="Actor\Door.h" />
@@ -187,9 +189,9 @@
     <ClInclude Include="Actor\Projectile.h" />
     <ClInclude Include="Game\DebugCommandBinder.h" />
     <ClInclude Include="Game\GameManager.h" />
-    <ClInclude Include="Actor\HornObstacle.h" />
     <ClInclude Include="Game\ProjectileManager.h" />
     <ClInclude Include="Game\SpriteManager.h" />
+    <ClInclude Include="HUD\GameHUD.h" />
     <ClInclude Include="Level\GameLevel.h" />
     <ClInclude Include="Level\LevelItem.h" />
     <ClInclude Include="Level\StageSelectLevel.h" />

@@ -14,6 +14,7 @@ public:
 private:
 	virtual void Tick(float deltaTime) override;
 	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
+	virtual void OnCollision(const Actor* other);
 
 private:
 	Pixel::AstarAlgorithm aStar;

@@ -52,10 +52,10 @@ namespace Pixel
 	void Input::SavePreviousStates()
 	{
 		// 이전 프레임 입력 값 저장
-		for (KeyState& state : keyStates)
+		for (KeyState& currentState : keyStates)
 		{
 			// 현재 프레임 입력 값을 이전 프레임 값으로 저장
-			state.wasKeyDown = state.isKeyDown;
+			currentState.wasKeyDown = currentState.isKeyDown;
 		}
 	}
 }

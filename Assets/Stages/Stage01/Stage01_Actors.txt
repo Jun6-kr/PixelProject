@@ -1,5 +1,22 @@
-# Type, X, Y, RepeatCount
-Platform,120,145,5
-Platform,350,136,3
-AStarEnemy,350,130,1
-Airman,380,120,1
+# Type, X, Y, RepeatCountX, RepeatCountY
+Platform,10,80,3,1
+Platform,160,65,4,1
+Platform,250,136,3,1
+AStarEnemy,290,128,1,1
+
+Platform,375,110,2,1
+AStarEnemy,400,102,1,1
+
+Platform,455,130,3,1
+
+# Boss Entry
+Floor,570,70,1,1
+Floor,570,130,1,1
+Door,570,85,1,4
+
+# Boss Room
+Door,835,85,1,4
+Floor,835,145,1,1
+
+Airman,1045,120,1,1
+Wall,1100,0,1,10

@@ -1,0 +1,9 @@
+[PLAYER]
+Width=20
+Height=20
+MoveSpeed=50
+JumpSpeed=45
+Gravity=60
+HP=28
+BlockMask=
+DamageMask=

@@ -11,167 +11,171 @@ Player::Player()
 	height = 20;
 
 	actorType = ActorType::Player;
-	blockMask = 0b00001;
-	damageMask = 0b10100;
-	HP = 28;
-}
-
-Player::Player(const Vector2& position)
-	: Actor(position), posX(static_cast<float>(position.x)), posY(static_cast<float>(position.y))
-{
-	width = 20;
-	height = 20;
-
-	actorType = ActorType::Player;
-	blockMask = 0b00001;
-	damageMask = 0b10100;
-	HP = 28;
+	blockMask = 0b00100;
+	damageMask = 0b01010;
+	hp = 28;
+	maxHp = 28;
 }
 
 Player::~Player()
 {
 }
 
-void Player::SetAnimationClip(State state, const Pixel::AnimationClip* clip)
+void Player::SetAnimationClip(const int stateIndex, const Pixel::AnimationClip* clip)
 {
-	switch (state)
+	switch (stateIndex)
 	{
-	case State::Idle:
+	case 0:
 		idleAnimtaion = clip;
 		break;
-	case State::Move:
+	case 1:
 		moveAnimation = clip;
 		break;
-	case State::Jump:
-		jumpAnimation = clip;
-		break;
-	case State::Attack:
+	case 2:
 		attackAnimation = clip;
 		break;
-	case State::JumpAttack:
+	case 3:
+		jumpAnimation = clip;
+		break;
+	case 4:
 		jumpAttackAnimation = clip;
 	}
 }
 
-void Player::UpdateFloatPosition(const Pixel::Vector2& position)
+void Player::SetPosition(const Vector2& newPosition)
 {
-	SetPosition(position);
-	posX = static_cast<float>(position.x);
-	posY = static_cast<float>(position.y);
+	posX = static_cast<float>(newPosition.x);
+	posY = static_cast<float>(newPosition.y);
+	super::SetPosition(newPosition);
 }
 
-void Player::BeginPlay()
+void Player::UpdateFloatPosition(float deltaTime)
 {
-	super::BeginPlay();
+	posX += moveSpeed * deltaTime;
+
+	Vector2 newPosition = GetPosition();
+	newPosition.x = static_cast<int>(posX);
+
+	if (posY < 85 || posY > 110)
+	{
+		posY = 100.f;
+	}
+
+	newPosition.y = static_cast<int>(posY);
+	SetPosition(newPosition);
+}
+
+void Player::OnDamaged(const int damage)
+{
+	actionState = ActionState::Damaged;
+	damagedTimer = damageInterval;
+
+	if (damage >= hp)
+	{
+
+		return;
+	}
+
+	super::OnDamaged(damage);
+	OnHpDamaged(hp, maxHp);
+}
+
+void Player::Reset()
+{
+	velocityY = 0;
+	movementState = MovementState::Idle;
+	actionState = ActionState::None;
 }
 
 void Player::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
 
+	if (!enableInput)
+	{
+		return;
+	}
+
 	if (Input::Get().GetKeyDown(VK_ESCAPE))
 	{
 		QuitGame();
 	}
 
-	float moveX = 0.0f;
+	float deltaX = 0.0f;
 
 	if (Input::Get().GetKey(VK_LEFT))
 	{
 		isForward = false;
-
-		if (currentState != State::Jump && currentState != State::JumpAttack && currentState != State::Attack)
-		{
-			UpdateState(State::Move);
-		}
-		moveX -= moveSpeed * deltaTime;
-	}
-	else if (Input::Get().GetKeyUp(VK_LEFT))
-	{
-		if (currentState != State::Jump && currentState != State::JumpAttack)
-		{
-			UpdateState(prevState);
-		}
-	}
+		deltaX -= moveSpeed * deltaTime;
+	} 
 
 	if (Input::Get().GetKey(VK_RIGHT))
 	{
 		isForward = true;
-
-		if (currentState != State::Jump && currentState != State::JumpAttack)
-		{
-			UpdateState(State::Move);
-		}
-		moveX += moveSpeed * deltaTime;
-	}
-	else if (Input::Get().GetKeyUp(VK_RIGHT))
-	{
-		if (currentState != State::Jump && currentState != State::JumpAttack)
-		{
-			UpdateState(prevState);
-		}
+		deltaX += moveSpeed * deltaTime ;
 	}
 
 	// 점프
-	if (Input::Get().GetKeyDown(VK_UP) && currentState != State::Jump && currentState != State::JumpAttack)
+	if (Input::Get().GetKeyDown(VK_UP))
 	{
-		UpdateState(State::Jump);
-		velocityY -= jumpSpeed;
-		standingPlatform.reset();
+		if (movementState != MovementState::Jump)
+		{
+			movementState = MovementState::Jump;
+			velocityY -= jumpSpeed;
+			standingPlatform.reset();
+		}
 	}
+
+	if (movementState != MovementState::Jump)
+	{
+		if (deltaX != 0.f)
+		{
+			movementState = MovementState::Move;
+		}
+		else
+		{
+			movementState = MovementState::Idle;
+		}
+	}
+
 
 	if (Input::Get().GetKeyDown(VK_SPACE))
 	{
-		if (currentState == State::Jump || currentState == State::JumpAttack)
+		if (actionState != ActionState::Damaged)
 		{
-			UpdateState(State::JumpAttack);
-		}
-		else
-		{
-			UpdateState(State::Attack);
-		}
-
-		if (shootElapsed > shootInterval)
-		{
-			shootElapsed = 0;
 			ShootRockBuster();
 		}
-		else
-		{
-			shootElapsed += deltaTime;
-		}
 	}
-	else if (Input::Get().GetKeyUp(VK_SPACE))
-	{
-		UpdateState(prevState);
-	}
+
+	UpdateActionState(deltaTime);
 
 	velocityY += gravity * deltaTime;
-	float moveY = velocityY * deltaTime;
+	float deltaY = velocityY * deltaTime;
 
-	if (CanMove(moveX, 0))
+	if (CanMove(deltaX, 0))
 	{
-		posX += moveX;
+		posX += deltaX;
 	}
 
-	if (CanMove(0, moveY))
+	if (CanMove(0, deltaY))
 	{
-		posY += moveY;
+		posY += deltaY;
 	}
 	else
 	{
 		velocityY = 0;
-		if (currentState == State::Jump || currentState == State::JumpAttack)
+
+		if (movementState == MovementState::Jump)
 		{
-			UpdateState(State::Idle);
+			movementState = MovementState::Idle;
 		}
 	}
 
 	Vector2 newPosition = GetPosition();
 	newPosition.x = static_cast<int>(posX);
 	newPosition.y = static_cast<int>(posY);
-
 	SetPosition(newPosition);
+
 	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
 	{
 		level->UpdateCamera(posX);
@@ -182,33 +186,41 @@ void Player::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 {
 	Vector2 pos = position - screenOffset;
 
-	switch (currentState)
+	if (actionState == ActionState::Attack)
 	{
-	case State::Idle:
-		if (idleIndex >= idleAnimtaion->GetSize())
+		if (movementState == MovementState::Jump)
 		{
-			idleIndex = 0;
+			jumpAttackAnimation->PlayAnimation(0, pos, screenEnd, isForward);
 		}
-		idleAnimtaion->PlayAnimation(idleIndex, pos, screenEnd);
-		++idleIndex;
-		break;
-	case State::Move:
-		if (moveIndex >= moveAnimation->GetSize())
+		else
 		{
-			moveIndex = 0;
+			attackAnimation->PlayAnimation(windIndex, pos, screenEnd, isForward);
 		}
-		moveAnimation->PlayAnimation(moveIndex, pos, screenEnd);
-		++moveIndex;
-		break;
-	case State::Jump:
-		jumpAnimation->PlayAnimation(0, pos, screenEnd);
-		break;
-	case State::Attack:
-		attackAnimation->PlayAnimation(attackIndex, pos, screenEnd);
-		break;
-	case State::JumpAttack:
-		jumpAttackAnimation->PlayAnimation(0, pos, screenEnd);
-		break;
+	}
+	else
+	{
+		switch (movementState)
+		{
+		case MovementState::Idle:
+			if (idleIndex >= idleAnimtaion->GetSize())
+			{
+				idleIndex = 0;
+			}
+			idleAnimtaion->PlayAnimation(idleIndex, pos, screenEnd, isForward);
+			++idleIndex;
+			break;
+		case MovementState::Move:
+			if (moveIndex >= moveAnimation->GetSize())
+			{
+				moveIndex = 0;
+			}
+			moveAnimation->PlayAnimation(moveIndex, pos, screenEnd, isForward);
+			++moveIndex;
+			break;
+		case MovementState::Jump:
+			jumpAnimation->PlayAnimation(0, pos, screenEnd, isForward);
+			break;
+		}
 	}
 }
 
@@ -222,18 +234,45 @@ bool Player::CanMove(float toX, float toY)
 
 	Rect rect = GetBounds();
 	rect.left += toX;
-	rect.height += toY;
+	rect.top += toY;
 
 	// Damage 계산은 Enemy / Bullet 쪽에서
 	CollisionResult result = level->CheckCollision(this, rect);
 	return !result.isBlocked;
 }
 
+void Player::UpdateActionState(float deltaTime)
+{
+	switch (actionState)
+	{
+	case ActionState::Attack:
+		attackTimer -= deltaTime;
+
+		if (attackTimer <= 0.0f)
+		{
+			actionState = ActionState::None;
+		}
+		break;
+		
+	case ActionState::Damaged:
+		damagedTimer -= deltaTime;
+
+		if (damagedTimer <= 0.0f)
+		{
+			actionState = ActionState::None;
+		}
+		break;
+	}
+}
+
 void Player::ShootRockBuster()
 {
 	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
 	{
+		actionState = ActionState::Attack;
+		attackTimer = attackInterval;
+
 		// 20, 11에서만 발사
-		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(20, 9), Vector2(1, 0));
+		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(isForward ? 20 : 0, 9), Vector2(isForward ? 1 : -1, 0));
 	}
 }

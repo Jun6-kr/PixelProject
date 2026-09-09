@@ -13,8 +13,6 @@ class Enemy : public Pixel::Actor
 public:
 	Enemy(const Pixel::Vector2& position = Pixel::Vector2::Zero);
 
-	virtual Pixel::Rect GetBounds() const override;
-
 protected:
 	const Pixel::AnimationClip* idleAnimtaion = nullptr;
 };

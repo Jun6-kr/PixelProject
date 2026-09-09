@@ -78,17 +78,12 @@ namespace Pixel
 
 		cbi.ColorTable[9] = RGB(210, 65, 90);		// Platform Wine
 
-		cbi.ColorTable[10] = RGB(88, 99, 239);		// title blue
+		cbi.ColorTable[10] = RGB(226, 127, 67);		// title orange
 		cbi.ColorTable[11] = RGB(243, 225, 77);		// ariman yellow 
 		cbi.ColorTable[12] = RGB(110, 112, 116);	// title gray
 
 		cbi.ColorTable[13] = RGB(225, 0, 0);		// 
-		cbi.ColorTable[14] = RGB(0, 255, 0);		// 
-		 
-		int windowWidth = cbi.srWindow.Right - cbi.srWindow.Left + 1;
-		int windowHeight = cbi.srWindow.Bottom - cbi.srWindow.Top + 1;
-		OutputDebugStringA(("[" + std::to_string(windowWidth) + ", " + std::to_string(windowHeight) + "]" + "\n").c_str());
-
+		cbi.ColorTable[14] = RGB(0, 255, 0);		//
 
 		// bug: SetConsoleScreenBufferInfoEx는 srWindow.Right/Bottom을 -1 해서 넘겨야 함
 		cbi.srWindow.Right -= 1;

@@ -2,9 +2,11 @@
 #include <Game/GameManager.h>
 #include <Actor/Player.h>
 #include <Actor/Platform.h>
+#include <Actor/Door.h>
 #include <Actor/AStarEnemy.h>
 #include <Actor/AStarBullet.h>
 #include <Actor/Airman.h>
+#include <Actor/AirShooter.h>
 
 #include <Util/Util.h>
 #include <Render/Renderer.h>
@@ -17,38 +19,57 @@ using namespace JxDebug;
 
 GameLevel::GameLevel()
 {
+	screenXMax = entryRoomCameraX;
 }
 
 void GameLevel::SetInitData(const std::string& path, std::shared_ptr<Player> player)
 {
 	LoadLevelData(path);
 
-	binder.Bind("soft reset", [this]()
+	//binder.Bind("soft reset", [this]()
+	//	{
+	//		SoftReset();
+	//	});
+	//
+	//binder.Bind("teleport boss", [this]()
+	//	{
+	//		TeleportBoss();
+	//	});
+	//
+	//binder.Bind("boss phase2", [this]()
+	//	{
+	//		BossPhase2();
+	//	});
+
+	// HUD 설정
+	player->BindDamageFunction([this](int hp, int max)
 		{
-			SoftReset();
+			hud.OnPlayerDamaged(hp, max);
 		});
 
-	binder.Bind("teleport boss", [this]()
-		{
-			TeleportBoss();
-		});
+	if (boss)
+	{
+		boss;
+	}
 
-	binder.Bind("boss phase2", [this]()
-		{
-			BossPhase2();
-		});
 
-	player->UpdateFloatPosition(stageData.config.PlayerSpawnPos);
+	player->SetPosition(stageData.config.PlayerSpawnPos);
 	addRequestedActorList.emplace_back(player);
 
 	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
 	projectileManager.LoadProjectileDefinition(ProjectileType::RockBuster, game.GetClip("RockBuster"));
 	projectileManager.LoadProjectileDefinition(ProjectileType::AirShooter, game.GetClip("AirShooter"));
 	projectileManager.LoadProjectileDefinition(ProjectileType::Astar, game.GetClip("AStar"));
+
 }
 
 void GameLevel::UpdateCamera(float playerWorldX)
 {
+	if (isDoorTransition)
+	{
+		return;
+	}
+
 	const float followX = static_cast<float>(camEnd.x / 2);
 
 	float playerScreenX = playerWorldX - screenOffsetX;
@@ -58,7 +79,8 @@ void GameLevel::UpdateCamera(float playerWorldX)
 		screenOffsetX = static_cast<int>(playerWorldX - followX);
 	}
 
-	screenOffsetX = std::clamp(screenOffsetX, 0, stageData.config.stageWidth - camEnd.x);
+	screenOffsetX = std::clamp(screenOffsetX, 0, screenXMax - camEnd.x);
+	//screenOffsetX = std::clamp(screenOffsetX, 0, stageData.config.stageWidth - camEnd.x);
 }
 
 CollisionResult GameLevel::CheckCollision(const Actor* requester, Rect rect)
@@ -82,10 +104,14 @@ CollisionResult GameLevel::CheckCollision(const Actor* requester, Rect rect)
 
 		uint32_t typeMask = static_cast<uint32_t>(requester->GetActorType());
 
-		if (actor->GetBlockMask() & typeMask)
+		if (typeMask)
+
+ 		if (actor->GetBlockMask() & typeMask)
 		{
 			result.isBlocked = true;
 			result.actor = actor;
+
+			actor->OnCollision(requester);
 		}
 
 		if (actor->GetDamageMask() & typeMask)
@@ -98,9 +124,35 @@ CollisionResult GameLevel::CheckCollision(const Actor* requester, Rect rect)
 	return result;
 }
 
-void GameLevel::ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction)
+Projectile* GameLevel::ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction)
 {
-	projectileManager.SpwnProjectile(type, position, direction, this);
+	return projectileManager.SpwnProjectile(type, position, direction, this);
+}
+
+void GameLevel::EnterBossEntryRoom()
+{
+	if (isDoorTransition)
+		return;
+
+	isDoorTransition = true;
+	screenTargetX = entryRoomCameraX - 18;
+	screenXMax = bossRoomCameraX;
+
+	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+	game.GetPlayer().lock()->SetEnableInput(false);
+}
+
+void GameLevel::EnterBossRoom()
+{
+	if (isDoorTransition)
+		return;
+
+	isDoorTransition = true;
+	screenTargetX = bossRoomCameraX - 18;
+	screenXMax = stageData.config.stageWidth;
+
+	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+	game.GetPlayer().lock()->SetEnableInput(false);
 }
 
 void GameLevel::OnInitialized()
@@ -116,9 +168,17 @@ void GameLevel::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
 	
+	hud.Tick(deltaTime);
+
 	if (Input::Get().GetKeyDown('P'))
 	{
 		DebugSystem::Get().SetDebugMode(!DebugSystem::Get().IsDebugMode());
+	}
+
+	if (isDoorTransition)
+	{
+		UpdateCameraTransition(deltaTime);
+		return;
 	}
 }
 
@@ -158,26 +218,6 @@ void GameLevel::Draw()
 		}
 
 		actor->Draw(screenOffset, camEnd);
-
-		//// 1. World -> Screen
-		//int screenLeft = bound.left - screenOffsetX;
-		//int screenTop = bound.top - screenOffsetY;
-		//int screenRight = screenLeft + bound.width;
-		//int screenBottom = screenTop + bound.height;
-		//
-		//// 2. 화면 영역으로 Clip
-		//int clippedLeft = screenLeft > 0 ? screenLeft : 0;
-		//int clippedTop = screenTop > 0 ? screenTop : 0;
-		//int clippedRight = screenRight < camEnd.x ? screenRight : camEnd.x;
-		//int clippedBottom = screenBottom < camEnd.y ? screenBottom : camEnd.y;
-		//
-		//// 3. 최종 Screen 기준 Box
-		//int clippedWidth = clippedRight - clippedLeft;
-		//int clippedHeight = clippedBottom - clippedTop;
-		//
-		//JxDebug::DebugBox box = DebugAdapter::Get().MakeDebugBox(
-		//	Vector2(clippedLeft, clippedTop), clippedWidth, clippedHeight);
-		//JxDebug::DebugSystem::Get().AddBox(box);
 	}
 }
 
@@ -307,13 +347,16 @@ void GameLevel::LoadActorList(const std::string& actorPath)
 			case 2:
 				data.position.y = std::stoi(value);
 				break;
+			case 3:
+				data.tileCountX = std::stoi(value);
+				break;
 			}
 
 			start = pos + 1;
 			++index;
 		}
 
-		data.tileCountX = std::stoi(str.substr(start));
+		data.tileCountY = std::stoi(str.substr(start));
 		SpawnActorWithData(data);
 		stageData.actors.emplace_back(data);
 	}
@@ -327,13 +370,16 @@ void GameLevel::SetBlockedLocation(const Actor* spawned)
 
 	for (int jx = 0; jx < height; ++jx)
 	{
+		pos.x = spawned->GetPosition().x;
+
 		for (int ix = 0; ix < width; ++ix)
 		{
-			pos.x += ix;
+			pos.x += 1;
+			JxDebug::DebugSystem::Get().Print("x : ", pos.x, ", y : ", pos.y);
 			blockedPosition.insert(pos);
 		}
 
-		pos.y += jx;
+		pos.y += 1;
 	}
 }
 
@@ -341,10 +387,9 @@ void GameLevel::SpawnActorWithData(const ActorSpawnData& data)
 {
 	Actor* spawned = nullptr;
 
-	if (data.actorId == "Platform")
+	if (data.actorId == "Platform" || data.actorId == "Floor" || data.actorId == "Wall")
 	{
-		spawned = SpawnActor<Platform>(data.position, data.tileCountX).get();
-		//spawned->SetOwner(this);
+		spawned = SpawnActor<Platform>(data.actorId, data.position, data.tileCountX, data.tileCountY).get();
 	}
 	else if (data.actorId == "AStarEnemy")
 	{
@@ -353,11 +398,46 @@ void GameLevel::SpawnActorWithData(const ActorSpawnData& data)
 	else if (data.actorId == "Airman")
 	{
 		spawned = SpawnActor<Airman>(data.position).get();
+		boss = dynamic_cast<Airman*>(spawned);
+	}
+	else if (data.actorId == "Door")
+	{
+		spawned = SpawnActor<Door>(data.position, data.tileCountY, data.position.x > entryRoomCameraX).get();
 	}
 
 	if (spawned)
 	{
 		SetBlockedLocation(spawned);
+	}
+}
+
+void GameLevel::UpdateCameraTransition(float deltaTime)
+{
+	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+	Player* player = game.GetPlayer().lock().get();
+
+	screenOffsetX += static_cast<int>(transitionSpeed * deltaTime);
+	player->UpdateFloatPosition(deltaTime * 0.52f);
+
+	if (screenOffsetX >= screenTargetX)
+	{
+		screenOffsetX = screenTargetX;
+		isDoorTransition = false;
+		player->SetPosition(Vector2(player->GetPosition().x + 3, player->GetPosition().y));
+		player->SetEnableInput(true);
+
+		if (bossEntryState == BossEntryState::Stage)
+		{
+			bossEntryState = BossEntryState::EntryRoom;
+		}
+		else if (bossEntryState == BossEntryState::EntryRoom)
+		{
+			bossEntryState = BossEntryState::BossRoom;
+			if (boss)
+			{
+				boss->StartPhase1();
+			}
+		}
 	}
 }
 
@@ -374,6 +454,12 @@ void GameLevel::SpawnProjectilePool()
 		std::shared_ptr<Projectile> projectile = SpawnActor<AStarBullet>();
 		projectile->SetActive(false);
 		projectileManager.RegisterProjectilePool(ProjectileType::Astar, projectile);
+	}
+	for (int ix = 0; ix < 6; ++ix)
+	{
+		std::shared_ptr<Projectile> projectile = SpawnActor<AirShooter>();
+		projectile->SetActive(false);
+		projectileManager.RegisterProjectilePool(ProjectileType::AirShooter, projectile);
 	}
 }
 

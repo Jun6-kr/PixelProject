@@ -18,12 +18,20 @@ void Projectile::SetProjectileInfo(ProjectileDefination definition, const Pixel:
 {
 	projectileDef = definition;
 
+	if (projectileDef.type == ProjectileType::RockBuster)
+	{
+		actorType = ActorType::RockBuster;
+	}
+
 	SetPosition(position);
 	posX = static_cast<float>(position.x);
 	posY = static_cast<float>(position.y);
 
 	width = projectileDef.width;
 	height = projectileDef.height;
+
+	damageMask = projectileDef.damageMask;
+	blockMask = projectileDef.blockMask;
 
 	this->direction = direction;
 
@@ -78,10 +86,14 @@ void Projectile::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 		return;
 	}
 
-	//int width = animation->GetWidth();
-	//int height = animation->GetSize();
-	//JxDebug::DebugSystem::Get().AddBox(position.x, position.y, width, height, 0x0D);
-
 	animation->PlayAnimation(animIndex, pos, screenEnd);
 	++animIndex;
+}
+
+void Projectile::OnCollision(const Actor* other)
+{
+	if (other->GetActorType() == ActorType::Terrain)
+	{
+		SetActive(false);
+	}
 }

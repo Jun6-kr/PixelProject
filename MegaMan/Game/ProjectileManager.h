@@ -2,13 +2,6 @@
 #include <Actor/Projectile.h>
 #include <unordered_map>
 
-enum class ProjectileType
-{
-	RockBuster = 0,
-	Astar,
-	AirShooter
-};
-
 namespace Pixel
 {
 	class AnimationClip;
@@ -24,7 +17,7 @@ public:
 	void LoadProjectileDefinition(ProjectileType type, const Pixel::AnimationClip* animation);
 	void RegisterProjectilePool(ProjectileType type, const std::shared_ptr<Projectile>& projectile);
 
-	void SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level = nullptr);
+	Projectile* SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level = nullptr);
 
 private:
 	std::vector<Projectile*> pool;

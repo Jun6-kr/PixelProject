@@ -2,6 +2,10 @@
 width = 1120
 height = 180
 
+[SCREEN]
+CameraWidth = 285
+CameraHeight = 165
+
 [Player Start]
 x = 80
 y = 10

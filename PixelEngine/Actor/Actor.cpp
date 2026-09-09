@@ -27,7 +27,7 @@ namespace Pixel
 	{
 	}
 
-	void Actor::OnCollision(const std::shared_ptr<Actor>& other)
+	void Actor::OnCollision(const Actor* other)
 	{
 	}
 
@@ -53,6 +53,17 @@ namespace Pixel
 
 		position = newPosition;
 	}
+
+	Rect Actor::GetBounds() const
+	{
+		return Rect(static_cast<float>(position.x)
+			, static_cast<float>(position.y)
+			, static_cast<float>(width)
+			, static_cast<float>(height));
+	}
+
 	void Actor::OnDamaged(const int damage)
-	{}
+	{
+		hp -= damage;
+	}
 }

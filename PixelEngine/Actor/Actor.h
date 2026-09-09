@@ -26,7 +26,7 @@ namespace Pixel
 		virtual void Draw(const Vector2& screenOffset = Vector2::Zero, const Vector2& screenEnd = Vector2::Zero);
 
 		// 충돌 이벤트 함수
-		virtual void OnCollision(const std::shared_ptr<Actor>& other);
+		virtual void OnCollision(const Actor* other);
 
 		// 액터 제거 함수
 		void Destroy();
@@ -46,12 +46,12 @@ namespace Pixel
 		inline void SetOwner(std::weak_ptr<Level> newOwner) { owner = newOwner; }
 
 		inline Vector2 GetPosition() const { return position; }
-		void SetPosition(const Vector2& newPosition);
+		virtual void SetPosition(const Vector2& newPosition);
 
 		inline Vector2 GetPreviousPosition() const { return previousPosition; }
 		inline void SavePreviousState() { previousPosition = position; }
 
-		Pixel::Rect virtual GetBounds() const = 0;
+		Pixel::Rect virtual GetBounds() const;
 		inline ActorType GetActorType() const { return actorType; }
 
 		virtual void OnDamaged(const int damage);
@@ -90,6 +90,7 @@ namespace Pixel
 		uint32_t blockMask = 0;
 		uint32_t damageMask = 0;
 
-		int HP = 0;
+		int hp = 0;
+		int maxHp = 0;
 	};
 }

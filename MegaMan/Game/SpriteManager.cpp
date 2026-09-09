@@ -10,69 +10,88 @@ SpriteManager::SpriteManager()
 
 const AnimationClip* SpriteManager::GetClip(const std::string& key)
 {
-	return &playerSpirtes[key];
+	return &spirtes[key];
 }
 
 void SpriteManager::LoadDefaultSprite()
 {
 	AnimationClip clip;
 	clip.AddFrame(Sprite("../Assets/Player/Idle/Idle_1.txt", ActorType::Player));
-	playerSpirtes["Idle"] = clip;
+	spirtes["Idle"] = clip;
 	clip = {};
 
 	clip.AddFrame(Sprite("../Assets/Player/Move/Move_1.txt", ActorType::Player));
 	clip.AddFrame(Sprite("../Assets/Player/Move/Move_2.txt", ActorType::Player));
 	clip.AddFrame(Sprite("../Assets/Player/Move/Move_3.txt", ActorType::Player));
-	playerSpirtes["Move"] = clip;
+	spirtes["Move"] = clip;
 	clip = {};
 
 	clip.AddFrame(Sprite("../Assets/Player/Attack/Attack.txt", ActorType::Player));
-	playerSpirtes["Attack"] = clip;
+	spirtes["Attack"] = clip;
 	clip = {};
 
 	clip.AddFrame(Sprite("../Assets/Player/JumpAttack/JumpAttack.txt", ActorType::Player));
-	playerSpirtes["JumpAttack"] = clip;
+	spirtes["JumpAttack"] = clip;
 	clip = {};
 
 	clip.AddFrame(Sprite("../Assets/Player/Jump/Jump.txt", ActorType::Player));
-	playerSpirtes["Jump"] = clip;
+	spirtes["Jump"] = clip;
 	clip = {};
 
 	// Platform
-	clip.AddFrame(Sprite("../Assets/Actors/Platform/Basic/Tile_01.txt", ActorType::Enemy));
-	playerSpirtes["Platform"] = clip;
+	clip.AddFrame(Sprite("../Assets/Actors/Platform/Basic/Platform.txt", ActorType::Terrain));
+	spirtes["Platform"] = clip;
 	clip = {};
+	clip.AddFrame(Sprite("../Assets/Actors/Platform/Basic/Wall.txt", ActorType::Terrain));
+	spirtes["Wall"] = clip;
+	clip = {};
+	clip.AddFrame(Sprite("../Assets/Actors/Platform/Basic/Floor.txt", ActorType::Terrain));
+	spirtes["Floor"] = clip;
+	clip = {};
+	clip.AddFrame(Sprite("../Assets/Actors/Door/Door.txt", ActorType::Terrain));
+	spirtes["Door"] = clip;
+	clip = {};
+
+
 
 	// Enemy
 	clip.AddFrame(Sprite("../Assets/Actors/Enemy/AStar/AStar.txt", ActorType::Enemy));
-	playerSpirtes["AStarEnemy"] = clip;
+	spirtes["AStarEnemy"] = clip;
 	clip = {};
 	
 	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Idle/Airman.txt", ActorType::Enemy));
-	playerSpirtes["Airman_Idle"] = clip;
+	spirtes["Airman_Idle"] = clip;
 	clip = {};
 	
-	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Attack/Airman1.txt", ActorType::Enemy));
-	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Attack/Airman2.txt", ActorType::Enemy));
-	playerSpirtes["Airman_Attack"] = clip;
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Wind/Airman1.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Wind/Airman2.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Wind/Airman3.txt", ActorType::Enemy));
+	spirtes["Airman_Wind"] = clip;
 	clip = {};
 	
-	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Jump/Airman.txt", ActorType::Enemy));
-	playerSpirtes["Airman_Jump"] = clip;
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/AirShooter/Airman.txt", ActorType::Enemy));
+	spirtes["Airman_Airshooter"] = clip;
 	clip = {};
+	
+	
+	//clip.AddFrame(Sprite("../Assets/Actors/Enemy/Airman/Jump/Airman.txt", ActorType::Enemy));
+	//playerSpirtes["Airman_Jump"] = clip;
+	//clip = {};
 
 
 	// Bullet
 	clip.AddFrame(Sprite("../Assets/Bullets/RockBuster/RockBuster.txt", ActorType::RockBuster));
-	playerSpirtes["RockBuster"] = clip;
+	spirtes["RockBuster"] = clip;
 	clip = {};
 
 	clip.AddFrame(Sprite("../Assets/Bullets/AStar/AStar.txt", ActorType::Bullet));
-	playerSpirtes["AStar"] = clip;
+	spirtes["AStar"] = clip;
 	clip = {};
 
 	clip.AddFrame(Sprite("../Assets/Bullets/AirShooter/AirShooter_1.txt", ActorType::Bullet));
 	clip.AddFrame(Sprite("../Assets/Bullets/AirShooter/AirShooter_2.txt", ActorType::Bullet));
-	playerSpirtes["AirShooter"] = clip;
+	clip.AddFrame(Sprite("../Assets/Bullets/AirShooter/AirShooter_2.txt", ActorType::Bullet));
+	spirtes["AirShooter"] = clip;
 	clip = {};
+
 }

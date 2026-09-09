@@ -27,7 +27,7 @@ public:
 
 	void ShowSelectedLevel();
 	void StartSelectedLevel(const std::string& levelName);
-	void TogglePauseMenu();
+	void ResetGameLevel();
 	void BackToTitle();
 
 	void FinishEffect(const Pixel::Vector2& position);
@@ -37,11 +37,22 @@ public:
 	std::weak_ptr<Player> GetPlayer() const { return player; }
 
 private:
+	virtual void Tick(float deltaTime) override;
+
+	void SpawnPlayerCharacter();
+
+private:
 	MenuState menuIndex = MenuState::Title;
 	std::vector<std::shared_ptr<Pixel::Level>> menuList;
 
+	std::string currentStage;
+
 	SpriteManager spriteManager;
 	std::shared_ptr<Player> player;
+
+	const float resetTime = 2.0f;
+	float resetGauge = 0.0f;
+	bool isReleasedReset = true;
 
 	// Debug
 	DebugCommandBinder binder;

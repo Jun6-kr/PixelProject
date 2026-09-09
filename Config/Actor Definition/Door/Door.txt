@@ -1,0 +1,5 @@
+[Door]
+Width=20
+Height=20
+BlockMask=
+DamageMask=

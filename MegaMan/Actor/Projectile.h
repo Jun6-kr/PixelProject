@@ -3,8 +3,17 @@
 #include <Render/AnimationClip.h>
 
 
+enum class ProjectileType
+{
+	RockBuster = 0,
+	Astar,
+	AirShooter
+};
+
 struct ProjectileDefination
 {
+	ProjectileType type = ProjectileType::RockBuster;
+
 	const Pixel::AnimationClip* animation = nullptr;
 
 	int width = 0;
@@ -35,6 +44,8 @@ public:
 protected:
 	virtual void Tick(float deltaTime) override;
 	virtual void Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd) override;
+
+	virtual void OnCollision(const Actor* other) override;
 
 protected:
 	ProjectileDefination projectileDef;

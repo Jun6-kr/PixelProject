@@ -4,38 +4,40 @@
 
 using namespace Pixel;
 
-Platform::Platform(const Vector2& position, int tileCountX) : Actor(position), tileCountX(tileCountX)
+Platform::Platform(const std::string& id, const Vector2& position, int tileCountX, int tileCountY) : Actor(position), tileCountX(tileCountX), tileCountY(tileCountY)
 {
 	actorType = ActorType::Terrain;
-	blockMask = 0b11010;
+	blockMask = 0b11011;
 	damageMask = 0b00000;
 
 	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
-	idleAnimtaion = game.GetClip("Platform");
+	idleAnimtaion = game.GetClip(id);
 
 	width = idleAnimtaion->GetWidth() * tileCountX;
-	height = idleAnimtaion->GetHeight();
+	height = idleAnimtaion->GetHeight() * tileCountY;
 }
 
 Platform::~Platform()
 {
 }
 
-Rect Platform::GetBounds() const
-{
-	return Rect(static_cast<float>(position.x)
-		, static_cast<float>(position.y)
-		, static_cast<float>(width)
-		, static_cast<float>(height));
-}
-
 void Platform::Draw(const Vector2& camOffset, const Vector2& camEnd)
 {
 	Vector2 pos = position - camOffset;
 
-	for (int ix = 0; ix < tileCountX; ++ix)
+	int tileWidth = idleAnimtaion->GetWidth();
+	int tileHeight = idleAnimtaion->GetHeight();
+
+	for (int iy = 0; iy < tileCountY; ++iy)
 	{
-		idleAnimtaion->PlayAnimation(0, pos, camEnd);
-		pos.x += idleAnimtaion->GetWidth();
+		for (int ix = 0; ix < tileCountX; ++ix)
+		{
+			Vector2 drawPos;
+
+			drawPos.x = pos.x + ix * tileWidth;
+			drawPos.y = pos.y + iy * tileHeight;
+
+			idleAnimtaion->PlayAnimation(0, drawPos, camEnd);
+		}
 	}
 }

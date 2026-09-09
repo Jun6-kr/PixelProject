@@ -1,11 +1,12 @@
 ﻿#include "AstarAlgorithm.h"
-#include <System/DebugSystem.h>
 
 namespace Pixel
 {
 	// 현재 노드를 기준(루트)으로 서브 트리를 최대(또는 최소)힙으로 만드는 함수.
-	void Heapify(std::vector<Node*>& vec, int length, int index)
+	void Heapify(std::vector<Node*>& vec, int index)
 	{
+		const int length = static_cast<int>(vec.size());
+
 		while (true)
 		{
 			// 가장 큰(또는 작은) 값을 가진 인덱스.
@@ -20,7 +21,7 @@ namespace Pixel
 			// 왼쪽 자손이 현재 노드 보다 크면(또는 작으면) 인덱스 교환.
 			//if (leftChild < length && array[leftChild] > array[selected])
 			if (leftChild < length
-				&& ((vec[leftChild]->fCost > vec[selected]->fCost)
+				&& ((vec[leftChild]->fCost < vec[selected]->fCost)
 				|| (vec[leftChild]->fCost == vec[selected]->fCost && vec[leftChild]->hCost < vec[selected]->hCost)))
 			{
 				selected = leftChild;
@@ -29,7 +30,7 @@ namespace Pixel
 			// 오른쪽 자손이 현재 노드 보다 크면(또는 작음) 인덱스 교환.
 			//if (rightChild < length && array[rightChild] > array[selected])
 			if (rightChild < length
-				&& ((vec[rightChild]->fCost > vec[selected]->fCost)
+				&& ((vec[rightChild]->fCost < vec[selected]->fCost)
 				|| (vec[rightChild]->fCost == vec[selected]->fCost && vec[rightChild]->hCost < vec[selected]->hCost)))
 			{
 				selected = rightChild;
@@ -49,10 +50,13 @@ namespace Pixel
 		}
 	}
 
-	// 마지막 원소부터 위로 올리면서 정리
-	void PushHeap(std::vector<Node*>& vec)
+	// 특정 노드부터 위로 올리면서 정리
+	void PushHeap(std::vector<Node*>& vec, int index)
 	{
-		int index = static_cast<int>(vec.size() - 1);
+		if (index < 0)
+		{
+			return;
+		}
 
 		// 루트의 최대(또는 최소) 값을 배열의 뒤쪽부터 정렬.
 		while(index > 0)
@@ -67,7 +71,7 @@ namespace Pixel
 				break;
 			}
 
-			std::swap(vec[0], vec[index]);
+			std::swap(vec[parent], vec[index]);
 			index = parent;
 		}
 	}
@@ -86,8 +90,6 @@ namespace Pixel
 			return { };
 		}
 
-		// 시각화 제거
-
 		startNode = CreateNode(start);
 		goalNode = CreateNode(goal);
 
@@ -97,7 +99,6 @@ namespace Pixel
 
 		openMap[startNode->position] = startNode;
 		openList.emplace_back(startNode);
-		PushHeap(openList);
 
 		const std::vector<Direction> directions =
 		{
@@ -106,6 +107,7 @@ namespace Pixel
 
 		while (!openMap.empty())
 		{
+			// 힙 정렬 유지 시, 최상단 노드 = cost가 가장 낮은 노드
 			Node* currentNode = openList[0];
 			 
 			if (currentNode->position == goalNode->position)
@@ -113,9 +115,15 @@ namespace Pixel
 				return ConstructPath(currentNode);
 			}
 
-			// 힙정렬로 가장 낮은 값이 앞으로 왔고 그걸 뽑았으니까, 앞을 제거하면 되지 않을까?
+			// 최상단 노드가 goal이 아닐 시 openList -> closedSet으로 이관
+			// openList 제거 시 트리 구조 불안정 -> 최하단 노드와 교체 후 제거
+			// 제거 과정에서 최하단 노드가 올라와 힙(최상단이 최소cost 구조) 붕괴 
+			// 최상단 노드부터 자식 노드들 중 cost가 낮은 것을 부모와 교체하는 Heapify 진행 -> 힙 성질 복구
 			openMap.erase(currentNode->position);
-			openList.erase(openList.begin());
+			std::swap(openList[0], openList.back());
+			openList.pop_back();
+			Heapify(openList, 0);
+			
 			closedSet.insert(currentNode->position);
 
 			for (const Direction& direction : directions)
@@ -148,6 +156,10 @@ namespace Pixel
 						openNode->gCost = newGCost;
 						openNode->fCost = openNode->gCost + openNode->hCost;
 						openNode->parent = currentNode;
+
+						// 기존 노드의 cost 갱신 시 해당 노드 인덱스 부터
+						// 상향식(bottom to top) heap 정렬 - PushHeap 진행
+						PushHeap(openList, GetIndexInOpenList(openNode->position));
 					}
 
 					continue;
@@ -159,8 +171,9 @@ namespace Pixel
 				neighbor->hCost = CalculateHeuristic(neighbor->position, goalNode->position);
 				neighbor->fCost = neighbor->gCost + neighbor->hCost;
 				
+				// 새로운 이웃 노드 추가 시 상향식(bottom to top) heap 정렬 - PushHeap 진행
 				openList.emplace_back(neighbor);
-				PushHeap(openList);
+				PushHeap(openList, static_cast<int>(openList.size() - 1));
 				openMap[neighbor->position] = neighbor;
 			}
 		}
@@ -252,5 +265,17 @@ namespace Pixel
 			&& worldStartPosition.y <= y
 			&& x < worldBoundary.x
 			&& y < worldBoundary.y;
+	}
+	const int AstarAlgorithm::GetIndexInOpenList(const Vector2& position)
+	{
+		for (int ix = 0; ix < openList.size(); ++ix)
+		{
+			if (openList[ix]->position == position)
+			{
+				return ix;
+			}
+		}
+
+		return -1;
 	}
 }

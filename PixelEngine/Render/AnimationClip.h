@@ -12,7 +12,7 @@ namespace Pixel
 		void AddFrame(Pixel::Sprite sprite);
 		const Pixel::Sprite& GetSprite(int index);
 
-		void PlayAnimation(const int index, const Vector2& screenPos, const Vector2& boundary) const;
+		void PlayAnimation(const int index, const Vector2& screenPos, const Vector2& boundary, bool flipX = false) const;
 
 		const int GetSize() const { return static_cast<int>(sprites.size()); }
 		const int GetWidth() const { return sprites[0].GetSpriteWidth(); }

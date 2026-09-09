@@ -34,7 +34,7 @@ void AStarBullet::Tick(float deltaTime)
 	}
 
 	moveTimer += projectileDef.speed * deltaTime;
-
+		
 	while (moveTimer >= 1.0f && astarIndex < route.size() - 1)
 	{
 		moveTimer -= 1.0f;
@@ -48,6 +48,7 @@ void AStarBullet::Tick(float deltaTime)
 		CollisionResult result = level->CheckCollision(this, GetBounds());
 		if (result.isDamaged)
 		{
+			astarIndex = 0;
 			result.actor.lock()->OnDamaged(projectileDef.damage);
 			SetActive(false);
 			return;
@@ -63,6 +64,7 @@ void AStarBullet::Tick(float deltaTime)
 	{
 		astarIndex = 0;
 		SetActive(false);
+
 		return;
 	}
 }
@@ -75,4 +77,10 @@ void AStarBullet::Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2&
 	{
 		JxDebug::DebugSystem::Get().AddBox(route[ix].x - screenOffset.x, route[ix].y - screenOffset.y, 1, 1, (ix < astarIndex) ? 0x0E : 0x0D);
 	}
+}
+
+void AStarBullet::OnCollision(const Actor* other)
+{
+	astarIndex = 0;
+	super::OnCollision(other);
 }

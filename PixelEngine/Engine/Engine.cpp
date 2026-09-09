@@ -33,9 +33,6 @@ namespace Pixel
 		// 렌더러 객체 생성
 		renderer = std::make_unique<Renderer>(Vector2(setting.width, setting.height));
 
-		// 콜리전 시스템 객체 생성
-		collisionSystem = std::make_unique<CollisionSystem>();
-
 		debugAdapter = std::make_unique<DebugAdapter>();
 	}
 
@@ -224,19 +221,6 @@ namespace Pixel
 		renderer->Draw();
 	}
 
-	void Engine::ProcessCollision()
-	{
-		// 예외처리
-		if (!mainLevel || !collisionSystem)
-		{
-			return;
-		}
-
-		// 충돌 처리
-		// 의존성 주입 (Dependency Injection)
-		collisionSystem->ProcessCollision(mainLevel->actorList);
-	}
-
 	void Engine::SavePreviousInputStates()
 	{
 		assert(input && "input should not be null here");
@@ -327,72 +311,9 @@ namespace Pixel
 				setting.height = static_cast<int>(atoi(value.c_str()));
 				assert(setting.height > 0);
 			}
-
 		}
 
 		// 처리가 완료되면 파일 닫기
 		file.close();
-
-		/* C 스타일 파일 IO */
-		////파일 열기 (개행 문자 처리를 쉽게 텍스트 모드로 열기)
-		//FILE* file = nullptr;
-		//fopen_s(&file, configDir, "rt");
-		//
-		//// 예외처리
-		//if (!file)
-		//{
-		//	std::cout << "Failed to open engien setting file\n";
-		//
-		//	// 디버그 모드에서 강제 중단 시키는 기능
-		//	__debugbreak();
-		//	return;
-		//}
-		//
-		//// 데이터 읽어오기
-		//const int bufferSize = 2048;
-		//char buffer[bufferSize] = {};
-		//
-		//size_t readSize = fread(buffer, sizeof(char), bufferSize, file);
-		//
-		//// 값 저장을 위해 서식 해석 (파싱 - Parsing) -> C++ Parsing으로 변경해보기
-		//// 문자열 자르기(split)
-		//char* context = nullptr;
-		//char* token = nullptr;
-		//
-		//// 파일에서 읽은 전체 문자열을 개행 문자(\n) 기준으로 처음 자르기
-		//token =	strtok_s(buffer, "\n", &context);
-		//
-		//// 나머지 부분으로 반복해서 자르기
-		//while (token)
-		//{
-		//	// 공백 전까지 읽은 문자열을 저장할 변수
-		//	char key[15] = {};
-		//
-		//	// 포맷을 지정한 문자열 열기
-		//	// 공백 문자를 만나면 그 전까지 읽어서 저장
-		//	sscanf_s(token, "%s", key, 15);
-		//
-		//	// 키 값을 비교해서 값 설정
-		//	if (strcmp(key, "framerate") == 0)
-		//	{
-		//		sscanf_s(token, "framerate = %f", &setting.frameRate);
-		//	}
-		//	else if (strcmp(key, "width") == 0)
-		//	{
-		//		sscanf_s(token, "width = %d", &setting.width);
-		//	}
-		//	else if (strcmp(key, "height") == 0)
-		//	{
-		//		sscanf_s(token, "height = %d", &setting.height);
-		//	}
-		//
-		//	// 나머지 문자열 자르기(개행 문자 기준으로)
-		//	token = strtok_s(nullptr, "\n", &context);
-		//}
-		//
-		//
-		//// 파일 닫기
-		//fclose(file);
-		//file = nullptr;
 	}
 }

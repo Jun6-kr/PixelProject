@@ -16,6 +16,6 @@ private:
 	void LoadDefaultSprite();
 
 private:
-	std::unordered_map<std::string, Pixel::AnimationClip> playerSpirtes;
+	std::unordered_map<std::string, Pixel::AnimationClip> spirtes;
 };
 

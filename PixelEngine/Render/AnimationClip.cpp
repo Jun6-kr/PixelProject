@@ -16,7 +16,7 @@ namespace Pixel
 		return sprites[index];
 	}
 
-	void AnimationClip::PlayAnimation(const int index, const Vector2& screenPos, const Vector2& boundary) const
+	void AnimationClip::PlayAnimation(const int index, const Vector2& screenPos, const Vector2& boundary, bool flipX) const
 	{
 		if (sprites.empty() || index >= sprites.size())
 		{
@@ -25,6 +25,6 @@ namespace Pixel
 
 		JxDebug::DebugSystem::Get().AddBox(screenPos.x, screenPos.y, GetWidth(), GetHeight());
 
-		sprites[index].Draw(screenPos, boundary);
+		sprites[index].Draw(screenPos, boundary, flipX);
 	}
 }

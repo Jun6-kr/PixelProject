@@ -9,7 +9,7 @@ Sprite::Sprite(const std::string& path, ActorType type) : actorType(type)
 	Util::LoadTextFile(path, sprite);
 }
 
-void Sprite::Draw(const Vector2& startPos, const Vector2& boundary) const
+void Sprite::Draw(const Vector2& startPos, const Vector2& boundary, bool flipX) const
 {
 	int xPos = startPos.x;
 	int yPos = startPos.y;
@@ -25,8 +25,14 @@ void Sprite::Draw(const Vector2& startPos, const Vector2& boundary) const
 			continue;
 		}
 
-		for (const char ch : str)
+		int width = static_cast<int>(str.size());
+		for (int ix = 0; ix < width; ++ix)
 		{
+			int x = ix;
+			if (!flipX)
+			{
+				x = width - 1 - x;
+			}
 			// 시작 지점이 화면을 넘어가면 그리지 않는다.
 			if (xPos < 0 || xPos > boundary.x)
 			{
@@ -34,11 +40,10 @@ void Sprite::Draw(const Vector2& startPos, const Vector2& boundary) const
 				continue;
 			}
 
-			Renderer::Get().Submit(" ", Vector2(xPos, yPos), (ch != '*') ? ch : 0xFF, static_cast<int>(actorType));
+			Renderer::Get().Submit(" ", Vector2(xPos, yPos), (str[x] != '*') ? str[x] : 0xFF, static_cast<int>(actorType));
 		
 			xPos += 1;
 		}
-
 		yPos += 1;
 	}
 }

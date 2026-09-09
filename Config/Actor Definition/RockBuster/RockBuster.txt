@@ -1,0 +1,4 @@
+[Rock Buster]
+Width=20
+Height=20
+Damage=4
