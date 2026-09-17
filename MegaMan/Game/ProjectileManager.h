@@ -23,5 +23,7 @@ private:
 	std::vector<Projectile*> pool;
 	std::unordered_map<ProjectileType, std::vector<Projectile*>> typePool;
 	std::unordered_map<ProjectileType, ProjectileDefination> projectileDefinitions;
+
+	const int maxAstarCount = 10;
 };
 

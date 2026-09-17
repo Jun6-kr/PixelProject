@@ -3,9 +3,16 @@
 #include <HUD/GameHUD.h>
 #include <Game/ProjectileManager.h>
 #include <Math/Rect.h>
+#include <Math/QuadTree.h>
 #include <Physics/Collision.h>
 #include <unordered_set>
 #include <Game/DebugCommandBinder.h>
+
+enum class CollisionMode
+{
+	BruteForce,
+	QuadTree
+};
 
 enum class BossEntryState
 {
@@ -84,20 +91,29 @@ private:
 	void SetBlockedLocation(const Pixel::Actor* spawned);
 
 	void SpawnActorWithData(const ActorSpawnData & data);
-
-	void UpdateCameraTransition(float deltaTime);
-
 	void SpawnProjectilePool();
 
-	void SoftReset();
+
+	void UpdateCameraTransition(float deltaTime);
+	void UpdateActiveActors();
+	
+	void SetCollisionMode(CollisionMode mode) { collisionMode = mode; }
+
+	void UpdateCollisions();
+	Pixel::CollisionResult CheckCollisionBruteForce(const Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckCollisionQuadTree(const Pixel::Actor* requester, Pixel::Rect rect);
+
 	void TeleportBoss();
 	void BossPhase2();
 
 private:
 	StageData stageData;
 	ProjectileManager projectileManager;
-	GameHUD hud;
 
+	CollisionMode collisionMode = CollisionMode::BruteForce;
+	Pixel::QuadTree quadTree;
+
+	GameHUD hud;
 
 	std::unordered_set<Pixel::Vector2> blockedPosition;
 

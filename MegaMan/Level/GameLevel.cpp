@@ -17,8 +17,9 @@
 using namespace Pixel;
 using namespace JxDebug;
 
-GameLevel::GameLevel()
+GameLevel::GameLevel() : quadTree(Rect(), 4, 4)
 {
+	
 	screenXMax = entryRoomCameraX;
 }
 
@@ -42,14 +43,20 @@ void GameLevel::SetInitData(const std::string& path, std::shared_ptr<Player> pla
 	//	});
 
 	// HUD 설정
-	player->BindDamageFunction([this](int hp, int max)
+	player->BindDamageFunction([this](int hp)
 		{
-			hud.OnPlayerDamaged(hp, max);
+			hud.OnPlayerHpChanged(hp);
 		});
 
 	if (boss)
 	{
-		boss;
+		hud.OnBossHpAnimationFinished([this]()
+			{
+				GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+				game.GetPlayer().lock()->SetEnableInput(true);
+
+				boss->StartPhase1();
+			});
 	}
 
 
@@ -85,43 +92,11 @@ void GameLevel::UpdateCamera(float playerWorldX)
 
 CollisionResult GameLevel::CheckCollision(const Actor* requester, Rect rect)
 {
-	CollisionResult result = {};
-
-	// AABB로 검사 진행 이전 검사 대상 
-	for (std::shared_ptr<Actor>& actor : actorList)
+	if (collisionMode == CollisionMode::BruteForce)
 	{
-		if (requester == actor.get())
-		{
-			continue;
-		}
-
-		Rect bound = actor->GetBounds();
-
-		if (!rect.Compare(bound))
-		{
-			continue;
-		}
-
-		uint32_t typeMask = static_cast<uint32_t>(requester->GetActorType());
-
-		if (typeMask)
-
- 		if (actor->GetBlockMask() & typeMask)
-		{
-			result.isBlocked = true;
-			result.actor = actor;
-
-			actor->OnCollision(requester);
-		}
-
-		if (actor->GetDamageMask() & typeMask)
-		{
-			result.isDamaged = true;
-			result.actor = actor;
-		}
+		return CheckCollisionBruteForce(requester, rect);
 	}
-
-	return result;
+	return CheckCollisionQuadTree(requester, rect);
 }
 
 Projectile* GameLevel::ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction)
@@ -175,6 +150,16 @@ void GameLevel::Tick(float deltaTime)
 		DebugSystem::Get().SetDebugMode(!DebugSystem::Get().IsDebugMode());
 	}
 
+	if (Input::Get().GetKeyDown('O'))
+	{
+		collisionMode = (collisionMode == CollisionMode::BruteForce)
+			? CollisionMode::QuadTree
+			: CollisionMode::BruteForce;
+	}
+
+	UpdateActiveActors();
+	UpdateCollisions();
+
 	if (isDoorTransition)
 	{
 		UpdateCameraTransition(deltaTime);
@@ -212,7 +197,7 @@ void GameLevel::Draw()
 
 		Rect rect(Vector2(screenOffset.x - 30, screenOffset.y - 30), Vector2(camEnd.x + screenOffsetX, camEnd.y + screenOffsetY));
 		Rect bound = actor->GetBounds();
-		if (!bound.Compare(bound))
+		if (!rect.Intersects(bound))
 		{
 			continue;
 		}
@@ -375,7 +360,6 @@ void GameLevel::SetBlockedLocation(const Actor* spawned)
 		for (int ix = 0; ix < width; ++ix)
 		{
 			pos.x += 1;
-			JxDebug::DebugSystem::Get().Print("x : ", pos.x, ", y : ", pos.y);
 			blockedPosition.insert(pos);
 		}
 
@@ -417,28 +401,141 @@ void GameLevel::UpdateCameraTransition(float deltaTime)
 	Player* player = game.GetPlayer().lock().get();
 
 	screenOffsetX += static_cast<int>(transitionSpeed * deltaTime);
-	player->UpdateFloatPosition(deltaTime * 0.52f);
+	player->UpdateFloatPosition(deltaTime * 0.45f);
 
 	if (screenOffsetX >= screenTargetX)
 	{
 		screenOffsetX = screenTargetX;
 		isDoorTransition = false;
 		player->SetPosition(Vector2(player->GetPosition().x + 3, player->GetPosition().y));
-		player->SetEnableInput(true);
 
 		if (bossEntryState == BossEntryState::Stage)
 		{
+			player->SetEnableInput(true);
 			bossEntryState = BossEntryState::EntryRoom;
 		}
 		else if (bossEntryState == BossEntryState::EntryRoom)
 		{
 			bossEntryState = BossEntryState::BossRoom;
-			if (boss)
-			{
-				boss->StartPhase1();
-			}
+
+			hud.OnAirmanPhaseBegan();
 		}
 	}
+}
+
+void GameLevel::UpdateActiveActors()
+{
+	Vector2 offsetStart(screenOffsetX, screenOffsetY);
+	Rect screenView = Rect(camStart + offsetStart, camEnd + offsetStart);
+
+	for (const std::shared_ptr<Actor>& actor : actorList)
+	{
+		bool inView = screenView.Intersects(actor->GetBounds());
+
+		if (inView && !actor->IsActive())
+		{
+			actor->SetActive(true);
+		}
+		else if (!inView && actor->IsActive())
+		{
+			actor->SetActive(false);
+		}
+	}
+}
+
+void GameLevel::UpdateCollisions()
+{
+	if (collisionMode != CollisionMode::QuadTree)
+	{
+		return;
+	}
+
+	Vector2 offsetStart(screenOffsetX, screenOffsetY);
+	Rect screenView = Rect(camStart + offsetStart, camEnd + offsetStart);
+	quadTree.Reset(screenView);
+
+	for (const std::shared_ptr<Actor>& actor : actorList)
+	{
+		if (!actor->IsActive())
+		{
+			continue;
+		}
+		
+		quadTree.Insert(actor.get());
+	}
+}
+
+CollisionResult GameLevel::CheckCollisionBruteForce(const Actor* requester, Rect rect)
+{
+	CollisionResult result = {};
+
+	// AABB로 검사 진행 이전 검사 대상 
+	for (std::shared_ptr<Actor>& actor : actorList)
+	{
+		if (requester == actor.get())
+		{
+			continue;
+		}
+
+		Rect bound = actor->GetBounds();
+
+		if (!rect.Intersects(bound))
+		{
+			continue;
+		}
+
+		uint32_t typeMask = static_cast<uint32_t>(requester->GetActorType());
+
+		if (actor->GetBlockMask() & typeMask)
+		{
+			result.isBlocked = true;
+			result.actor = actor.get();
+		}
+
+		if (actor->GetDamageMask() & typeMask)
+		{
+			result.isDamaged = true;
+			result.actor = actor.get();
+		}
+	}
+
+	return result;
+}
+
+CollisionResult GameLevel::CheckCollisionQuadTree(const Actor* requester, Rect rect)
+{
+	CollisionResult result = {};
+
+	std::vector<Actor*> candidates;
+	quadTree.Query(rect, candidates);
+
+	for (Actor* candidate : candidates)
+	{
+		if (requester == candidate)
+		{
+			continue;
+		}
+
+		uint32_t typeMask = static_cast<uint32_t>(requester->GetActorType());
+
+		if (typeMask)
+
+			if (candidate->GetBlockMask() & typeMask)
+			{
+				result.isBlocked = true;
+				result.actor = candidate;
+
+				candidate->OnCollision(requester);
+			}
+
+		if (candidate->GetDamageMask() & typeMask)
+		{
+			result.isDamaged = true;
+			result.actor = candidate;
+		}
+	}
+
+	return result;
 }
 
 void GameLevel::SpawnProjectilePool()
@@ -448,23 +545,21 @@ void GameLevel::SpawnProjectilePool()
 		std::shared_ptr<Projectile> projectile = SpawnActor<Projectile>();
 		projectile->SetActive(false);
 		projectileManager.RegisterProjectilePool(ProjectileType::RockBuster, projectile);
-	}
-	for (int ix = 0; ix < 32; ++ix)
-	{
-		std::shared_ptr<Projectile> projectile = SpawnActor<AStarBullet>();
-		projectile->SetActive(false);
-		projectileManager.RegisterProjectilePool(ProjectileType::Astar, projectile);
-	}
-	for (int ix = 0; ix < 6; ++ix)
-	{
-		std::shared_ptr<Projectile> projectile = SpawnActor<AirShooter>();
-		projectile->SetActive(false);
-		projectileManager.RegisterProjectilePool(ProjectileType::AirShooter, projectile);
-	}
-}
+		
+		if (ix < 6)
+		{
+			std::shared_ptr<Projectile> airshooter = SpawnActor<AirShooter>();
+			airshooter->SetActive(false);
+			projectileManager.RegisterProjectilePool(ProjectileType::AirShooter, airshooter);
+		}
 
-void GameLevel::SoftReset()
-{
+		if (ix < 10)
+		{
+			std::shared_ptr<Projectile> astar = SpawnActor<AStarBullet>();
+			astar->SetActive(false);
+			projectileManager.RegisterProjectilePool(ProjectileType::Astar, astar);
+		}
+	}
 }
 
 void GameLevel::TeleportBoss()

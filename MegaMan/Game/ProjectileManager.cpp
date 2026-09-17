@@ -19,7 +19,7 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.speed = 100;
 		def.width = 7;
 		def.height = 5;
-		def.blockMask = 0b01110;
+		def.blockMask = 0b01100;
 		def.damageMask = 0b01000;
 		break;
 	case ProjectileType::Astar:
@@ -28,7 +28,7 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.speed = 70;
 		def.width = 7;
 		def.height = 5;
-		def.blockMask = 0b01011;
+		def.blockMask = 0b01010;
 		def.damageMask = 0b10000;
 		break;
 	case ProjectileType::AirShooter:
@@ -67,6 +67,11 @@ Projectile* ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::
 			projectile = typePool[type][ix];
 			break;
 		}
+	}
+	
+	if (!projectile)
+	{
+		return nullptr;
 	}
 
 	ProjectileDefination def = projectileDefinitions[type];

@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 
 namespace Pixel
 {
@@ -27,7 +26,7 @@ namespace Pixel
 		bool isDamaged = false;
 		bool isBlocked = false;
 
-		std::weak_ptr<Actor> actor;
+		Actor* actor;
 		CollisionDirection direction = CollisionDirection::None;
 	};
 }

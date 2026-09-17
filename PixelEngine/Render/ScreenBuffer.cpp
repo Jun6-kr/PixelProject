@@ -47,7 +47,7 @@ namespace Pixel
 
 		// 결과 확인
 		assert(result == TRUE);
-
+		 
 		
 		// 직접 만든 콘솔의 커서 끄기
 		CONSOLE_CURSOR_INFO info;

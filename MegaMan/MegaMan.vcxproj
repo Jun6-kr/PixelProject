@@ -165,6 +165,8 @@
     <ClCompile Include="Actor\AStarEnemy.cpp" />
     <ClCompile Include="Actor\Door.cpp" />
     <ClCompile Include="Actor\Enemy.cpp" />
+    <ClCompile Include="Actor\Enemy\Horn.cpp" />
+    <ClCompile Include="Actor\HornObstacle.cpp" />
     <ClCompile Include="Actor\Player.cpp" />
     <ClCompile Include="Actor\Projectile.cpp" />
     <ClCompile Include="Game\DebugCommandBinder.cpp" />
@@ -185,6 +187,8 @@
     <ClInclude Include="Actor\AStarEnemy.h" />
     <ClInclude Include="Actor\Door.h" />
     <ClInclude Include="Actor\Enemy.h" />
+    <ClInclude Include="Actor\Enemy\Horn.h" />
+    <ClInclude Include="Actor\HornObstacle.h" />
     <ClInclude Include="Actor\Player.h" />
     <ClInclude Include="Actor\Projectile.h" />
     <ClInclude Include="Game\DebugCommandBinder.h" />

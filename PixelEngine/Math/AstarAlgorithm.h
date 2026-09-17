@@ -7,10 +7,10 @@
 
 namespace Pixel
 {
-	class PIXEL_API Node
+	class PIXEL_API AStarNode
 	{
 	public:
-		Node(const Vector2& position, Node* parent = nullptr) : position(position), parent(parent)
+		AStarNode(const Vector2& position, AStarNode* parent = nullptr) : position(position), parent(parent)
 		{}
 
 	public:
@@ -23,7 +23,7 @@ namespace Pixel
 		int fCost = 0;
 
 		// 최종 경로를 역추적할 때 사용할 부모 노드
-		Node* parent = nullptr;
+		AStarNode* parent = nullptr;
 	};
 
 	class PIXEL_API AstarAlgorithm
@@ -62,17 +62,17 @@ namespace Pixel
 		void Clear();
 
 		// 노드 생성 전문 함수
-		Node* CreateNode(const Vector2& position, Node* parent = nullptr);
+		AStarNode* CreateNode(const Vector2& position, AStarNode* parent = nullptr);
 
 		// 부모 노드를 역추적해서 경로를 구성하는 함수
-		std::vector<Vector2> ConstructPath(Node* destination);
+		std::vector<Vector2> ConstructPath(AStarNode* destination);
 
 		// 휴리스틱(추정 비용) 계산 함수
 		int CalculateHeuristic(const Vector2& current, const Vector2& goal) const;
 
 		// Open / Close 목록 검사 함수
 		bool IsInClosedList(int x, int y) const;
-		Node* FindOpenNode(int x, int y) const;
+		AStarNode* FindOpenNode(int x, int y) const;
 
 		bool IsInRange(int x, int y) const;
 
@@ -83,18 +83,18 @@ namespace Pixel
 		Vector2 worldBoundary;
 		
 		// 동적 할당된 모든 노드를 소유하는 목록 -> 소멸자에서 전체 동적할당 노드 메모리 해제시 사용
-		std::vector<Pixel::Node*> allocatedNodes;
+		std::vector<Pixel::AStarNode*> allocatedNodes;
 
 		// 탐색할 노드 목록
-		std::vector<Pixel::Node*> openList;
-		std::unordered_map<Pixel::Vector2, Pixel::Node*> openMap;
+		std::vector<Pixel::AStarNode*> openList;
+		std::unordered_map<Pixel::Vector2, Pixel::AStarNode*> openMap;
 		
 		// //탐색을 마친 노드 목록
 		std::unordered_set<Pixel::Vector2> closedSet;
 
 		// 시작/목표 노드
-		Pixel::Node* startNode = nullptr;
-		Pixel::Node* goalNode = nullptr;
+		Pixel::AStarNode* startNode = nullptr;
+		Pixel::AStarNode* goalNode = nullptr;
 
 		DebugAdapter deebug;
 	};

@@ -24,6 +24,12 @@ void AStarBullet::OnSpawn(GameLevel* level)
 	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
 	Player* player = game.GetPlayer().lock().get();
 	route = aStar.FindPath(position, player->GetPosition(), level->GetBlocked());
+
+	if (route.empty())
+	{
+		SetActive(false);
+		return;
+	}
 }
 
 void AStarBullet::Tick(float deltaTime)
@@ -48,8 +54,13 @@ void AStarBullet::Tick(float deltaTime)
 		CollisionResult result = level->CheckCollision(this, GetBounds());
 		if (result.isDamaged)
 		{
+			if (!result.actor)
+			{
+				return;
+			}
+
 			astarIndex = 0;
-			result.actor.lock()->OnDamaged(projectileDef.damage);
+			result.actor->OnDamaged(projectileDef.damage);
 			SetActive(false);
 			return;
 		}

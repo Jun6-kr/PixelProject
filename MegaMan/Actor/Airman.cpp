@@ -3,6 +3,8 @@
 #include <Level/GameLevel.h>
 #include <Actor/AirShooter.h>
 
+#include <System/DebugSystem.h>
+
 using namespace Pixel;
 
 Airman::Airman(const Vector2& position) : Enemy(position)
@@ -153,9 +155,9 @@ void Airman::SpawnAirShooters()
 
 			int dirX = isForward ? 1 : -1;
 			Vector2 target = spawnPosition + Vector2(deployOffsets[i].x * dirX,	deployOffsets[i].y);
+			JxDebug::DebugSystem::Get().AddBox(target.x, target.y, width, height, 0x0D);
 
 			shooter->SetDeployTarget(target);
-
 			airShooter.emplace_back(shooter);
 		}
 	}

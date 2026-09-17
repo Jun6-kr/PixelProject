@@ -51,10 +51,23 @@ void SpriteManager::LoadDefaultSprite()
 	clip.AddFrame(Sprite("../Assets/Actors/Door/Door.txt", ActorType::Terrain));
 	spirtes["Door"] = clip;
 	clip = {};
+	clip.AddFrame(Sprite("../Assets/Actors/Platform/Enemy/HornPlatform.txt", ActorType::Terrain));
+	spirtes["HornPlatform"] = clip;
+	clip = {};
 
 
 
 	// Enemy
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn1.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn2.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn3.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn4.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn5.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn6.txt", ActorType::Enemy));
+	clip.AddFrame(Sprite("../Assets/Actors/Enemy/Horn/Horn7.txt", ActorType::Enemy));
+	spirtes["Horn"] = clip;
+	clip = {};
+
 	clip.AddFrame(Sprite("../Assets/Actors/Enemy/AStar/AStar.txt", ActorType::Enemy));
 	spirtes["AStarEnemy"] = clip;
 	clip = {};

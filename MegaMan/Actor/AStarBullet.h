@@ -23,4 +23,3 @@ private:
 
 	float moveTimer = 0.0f;
 };
-

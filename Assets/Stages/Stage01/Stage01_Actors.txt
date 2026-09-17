@@ -1,11 +1,16 @@
 # Type, X, Y, RepeatCountX, RepeatCountY
-Platform,10,80,3,1
-Platform,160,65,4,1
-Platform,250,136,3,1
-AStarEnemy,290,128,1,1
+Floor,0,90,1,1
 
-Platform,375,110,2,1
-AStarEnemy,400,102,1,1
+#Platform,10,80,3,1
+#Platform,160,65,4,1
+#Platform,250,136,3,1
+
+HornPlatform,150,20,1,1
+
+#AStarEnemy,290,128,1,1
+
+Platform,375,115,2,1
+#AStarEnemy,400,107,1,1
 
 Platform,455,130,3,1
 

@@ -3,7 +3,7 @@
 namespace Pixel
 {
 	// 현재 노드를 기준(루트)으로 서브 트리를 최대(또는 최소)힙으로 만드는 함수.
-	void Heapify(std::vector<Node*>& vec, int index)
+	void Heapify(std::vector<AStarNode*>& vec, int index)
 	{
 		const int length = static_cast<int>(vec.size());
 
@@ -51,7 +51,7 @@ namespace Pixel
 	}
 
 	// 특정 노드부터 위로 올리면서 정리
-	void PushHeap(std::vector<Node*>& vec, int index)
+	void PushHeap(std::vector<AStarNode*>& vec, int index)
 	{
 		if (index < 0)
 		{
@@ -108,7 +108,7 @@ namespace Pixel
 		while (!openMap.empty())
 		{
 			// 힙 정렬 유지 시, 최상단 노드 = cost가 가장 낮은 노드
-			Node* currentNode = openList[0];
+			AStarNode* currentNode = openList[0];
 			 
 			if (currentNode->position == goalNode->position)
 			{
@@ -148,7 +148,7 @@ namespace Pixel
 
 				int newGCost = currentNode->gCost + direction.cost;
 
-				Node* openNode = FindOpenNode(newX, newY);
+				AStarNode* openNode = FindOpenNode(newX, newY);
 				if (openNode)
 				{
 					if (newGCost < openNode->gCost)
@@ -165,7 +165,7 @@ namespace Pixel
 					continue;
 				}
 
-				Node* neighbor = CreateNode(Vector2(newX, newY), currentNode);
+				AStarNode* neighbor = CreateNode(Vector2(newX, newY), currentNode);
 
 				neighbor->gCost = newGCost;
 				neighbor->hCost = CalculateHeuristic(neighbor->position, goalNode->position);
@@ -184,7 +184,7 @@ namespace Pixel
 	void AstarAlgorithm::Clear()
 	{
 		// 탐색 과정에서 생성했던 모든 노드 삭제 및 해제
-		for (Node* node : allocatedNodes)
+		for (AStarNode* node : allocatedNodes)
 		{
 			delete node;
 			node = nullptr;
@@ -200,19 +200,19 @@ namespace Pixel
 	}
 
 	// 노드를 생성하고, allocatedNodes에 추가
-	Node* AstarAlgorithm::CreateNode(const Vector2& position, Node* parent)
+	AStarNode* AstarAlgorithm::CreateNode(const Vector2& position, AStarNode* parent)
 	{
-		Node* newNode = new Node(position, parent);
+		AStarNode* newNode = new AStarNode(position, parent);
 		allocatedNodes.emplace_back(newNode);
 
 		return newNode;
 	}
 
-	std::vector<Vector2> AstarAlgorithm::ConstructPath(Node* destination)
+	std::vector<Vector2> AstarAlgorithm::ConstructPath(AStarNode* destination)
 	{
 		// 목표 노드로부터 부모 노드를 따라 경로 역추적
 		std::vector<Vector2> path;
-		Node* current = destination;
+		AStarNode* current = destination;
 
 		while (current)
 		{
@@ -250,9 +250,9 @@ namespace Pixel
 		return closedSet.find(Vector2(x, y)) != closedSet.end();
 	}
 
-	Node* AstarAlgorithm::FindOpenNode(int x, int y) const
+	AStarNode* AstarAlgorithm::FindOpenNode(int x, int y) const
 	{
-		Node* node = nullptr;
+		AStarNode* node = nullptr;
 
 		auto iter = openMap.find(Vector2(x, y));
 

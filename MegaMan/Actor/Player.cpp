@@ -77,7 +77,7 @@ void Player::OnDamaged(const int damage)
 	}
 
 	super::OnDamaged(damage);
-	OnHpDamaged(hp, maxHp);
+	OnHpChanged(hp);
 }
 
 void Player::Reset()
@@ -85,6 +85,8 @@ void Player::Reset()
 	velocityY = 0;
 	movementState = MovementState::Idle;
 	actionState = ActionState::None;
+	hp = 20;
+	OnHpChanged(hp);
 }
 
 void Player::Tick(float deltaTime)
@@ -233,8 +235,8 @@ bool Player::CanMove(float toX, float toY)
 	}
 
 	Rect rect = GetBounds();
-	rect.left += toX;
-	rect.top += toY;
+	rect.x += toX;
+	rect.y += toY;
 
 	// Damage 계산은 Enemy / Bullet 쪽에서
 	CollisionResult result = level->CheckCollision(this, rect);

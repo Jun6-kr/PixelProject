@@ -1,6 +1,5 @@
 #include "Projectile.h"
 #include <Physics/Collision.h>
-//#include <System/DebugSystem.h>
 #include <Level/GameLevel.h>
 
 using namespace Pixel;
@@ -58,7 +57,7 @@ void Projectile::Tick(float deltaTime)
 	CollisionResult result = level->CheckCollision(this, GetBounds());
 	if (result.isDamaged)
 	{
-		result.actor.lock()->OnDamaged(projectileDef.damage);
+		result.actor->OnDamaged(projectileDef.damage);
 		SetActive(false);
 		return;
 	}

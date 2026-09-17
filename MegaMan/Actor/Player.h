@@ -2,7 +2,7 @@
 #include <Actor/Actor.h>
 #include <functional>
 
-using HudCallback = std::function<void(int, const int)>;
+using HudCallback = std::function<void(const int)>;
 
 namespace Pixel
 {
@@ -59,7 +59,11 @@ public:
 
 	virtual void OnDamaged(const int damage);
 
-	void BindDamageFunction(HudCallback callback) { OnHpDamaged = std::move(callback); }
+	void BindDamageFunction(HudCallback callback)
+	{ 
+		OnHpChanged = std::move(callback);
+		OnHpChanged(hp);
+	}
 
 	void Reset();
 
@@ -77,7 +81,7 @@ private:
 	MovementState movementState = MovementState::Idle;
 	ActionState actionState = ActionState::None;
 
-	HudCallback OnHpDamaged;
+	HudCallback OnHpChanged;
 
 	int idleIndex = 0;
 	const Pixel::AnimationClip* idleAnimtaion = nullptr;
@@ -103,11 +107,11 @@ private:
 	float posX = 0.f;
 	float posY = 0.f;
 
-	const float moveSpeed = 45.f;
+	const float moveSpeed = 60.f;
 
 	const float jumpSpeed = 50.0f;
 	float velocityY = 0.f;
-	float gravity = 50.0f;
+	float gravity = 60.0f;
 
 	// Attack Timer
 	const float attackInterval = 1.0f;
