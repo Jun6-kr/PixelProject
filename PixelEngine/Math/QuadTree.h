@@ -5,60 +5,31 @@
 
 namespace Pixel
 {
-	// 메모리 삭제 함수
-	template<typename T>
-	void SafeDelete(T*& t)
-	{
-		if (t)
-		{
-			delete t;
-			t = nullptr;
-		}
-	}
-
 	class Actor;
-
-	enum class NodeIndex
-	{
-		TopLeft,
-		TopRight,
-		BottomLeft,
-		BottomRight,
-
-		Straddling,		// 경계선에 걸치는 경우
-		OutOfArea		// 영역을 벗어난 경우
-	};
+	class QuadNode;
 
 	class PIXEL_API QuadTree
 	{
 	public:
-		QuadTree(const Rect& bounds, int depth, int maxObjectsPerNode);
+		QuadTree();
+		~QuadTree();
 
-		void Insert(Actor* actor);
-		void Query(const Rect& queryBounds, std::vector<Actor*>& result) const;
+		void ResetTree(const Rect& screenRect);
 
-		void Reset(const Rect& newBounds);
+		// 트리에 노드를 추가하는 함수
+		bool Insert(Actor* actor);
 
-		void Clear();
+		// 전달한 노드와 겹치는 노드를 반환하는 함수
+		std::vector<Actor*> Query(const Rect& queryRect);
 
-	private:
-		bool Subdivide();
-		bool IsDivided() const { return topLeft != nullptr; }
-		
+		std::vector<Rect>& GetDebugRect();
+
 	public:
-		static const int maxDepth = 4;
+		static const int maxDepth = 5;
 
 	private:
-		Rect bounds;
-		int depth;
-		int maxObjectsPerNode;
-
-		std::vector<Actor*> objects;
-
-		QuadTree* topLeft = nullptr;
-		QuadTree* topRight = nullptr;
-		QuadTree* bottomLeft = nullptr;
-		QuadTree* bottomRight = nullptr;
+		std::vector<Rect> debugRect;
+		QuadNode* root = nullptr;
 	};
 }
 

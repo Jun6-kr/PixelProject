@@ -1,7 +1,7 @@
 ﻿#include "Airman.h"
 #include <Game/GameManager.h>
 #include <Level/GameLevel.h>
-#include <Actor/AirShooter.h>
+#include <Actor/Enemy/AirShooter.h>
 
 #include <System/DebugSystem.h>
 

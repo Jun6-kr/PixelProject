@@ -40,8 +40,6 @@ public:
 
 	virtual void OnDamaged(const int damage);
 
-	
-
 	void StartPhase1();
 
 private:

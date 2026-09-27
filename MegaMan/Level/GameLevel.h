@@ -3,7 +3,6 @@
 #include <HUD/GameHUD.h>
 #include <Game/ProjectileManager.h>
 #include <Math/Rect.h>
-#include <Math/QuadTree.h>
 #include <Physics/Collision.h>
 #include <unordered_set>
 #include <Game/DebugCommandBinder.h>
@@ -45,6 +44,7 @@ struct StageData
 namespace Pixel
 {
 	class Actor;
+	class QuadTree;
 }
 
 class Player;
@@ -56,6 +56,7 @@ class GameLevel : public Pixel::Level
 
 public:
 	GameLevel();
+	~GameLevel();
 
 	void SetInitData(const std::string& path, std::shared_ptr<Player> player);
 
@@ -63,7 +64,8 @@ public:
 
 	void UpdateCamera(float playerWorldX);
 
-	Pixel::CollisionResult CheckCollision(const Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckBlockCollision(Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckDamageCollision(Pixel::Actor* requester, Pixel::Rect rect);
 
 	Projectile* ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction);
 
@@ -99,9 +101,10 @@ private:
 	
 	void SetCollisionMode(CollisionMode mode) { collisionMode = mode; }
 
-	void UpdateCollisions();
-	Pixel::CollisionResult CheckCollisionBruteForce(const Pixel::Actor* requester, Pixel::Rect rect);
-	Pixel::CollisionResult CheckCollisionQuadTree(const Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckBlockCollisionBruteForce(const Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckDamageCollisionBruteForce(const Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckBlockCollisionQuadTree(Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckDamageCollisionQuadTree(Pixel::Actor* requester, Pixel::Rect rect);
 
 	void TeleportBoss();
 	void BossPhase2();
@@ -110,8 +113,8 @@ private:
 	StageData stageData;
 	ProjectileManager projectileManager;
 
-	CollisionMode collisionMode = CollisionMode::BruteForce;
-	Pixel::QuadTree quadTree;
+	CollisionMode collisionMode = CollisionMode::QuadTree;
+	Pixel::QuadTree* quadTree = nullptr;
 
 	GameHUD hud;
 

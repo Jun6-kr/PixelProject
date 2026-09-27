@@ -54,7 +54,7 @@ void Projectile::Tick(float deltaTime)
 
 	std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
 
-	CollisionResult result = level->CheckCollision(this, GetBounds());
+	CollisionResult result = level->CheckBlockCollision(this, GetBounds());
 	if (result.isDamaged)
 	{
 		result.actor->OnDamaged(projectileDef.damage);

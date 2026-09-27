@@ -3,6 +3,8 @@
 #include <Render/AnimationClip.h>
 #include <Level/GameLevel.h>
 
+#include <System/DebugSystem.h>
+
 using namespace Pixel;
 
 Player::Player()
@@ -15,6 +17,8 @@ Player::Player()
 	damageMask = 0b01010;
 	hp = 28;
 	maxHp = 28;
+
+	damagedTimer = damageDuration;
 }
 
 Player::~Player()
@@ -67,12 +71,17 @@ void Player::UpdateFloatPosition(float deltaTime)
 
 void Player::OnDamaged(const int damage)
 {
+	if (actionState == ActionState::Damaged)
+	{
+		return;
+	}
+
 	actionState = ActionState::Damaged;
-	damagedTimer = damageInterval;
+
 
 	if (damage >= hp)
 	{
-
+		// TODO : Death처리
 		return;
 	}
 
@@ -196,7 +205,23 @@ void Player::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 		}
 		else
 		{
-			attackAnimation->PlayAnimation(windIndex, pos, screenEnd, isForward);
+			attackAnimation->PlayAnimation(0, pos, screenEnd, isForward);
+		}
+	}
+	else if (actionState == ActionState::Damaged)
+	{
+		int blinkIndex = static_cast<int>(damagedTimer / damagedInterval);
+
+		if (blinkIndex % 2 == 0)
+		{
+			if (movementState == MovementState::Jump)
+			{
+				jumpAttackAnimation->PlayAnimation(0, pos, screenEnd, isForward);
+			}
+			else
+			{
+				attackAnimation->PlayAnimation(0, pos, screenEnd, isForward);
+			}
 		}
 	}
 	else
@@ -238,8 +263,7 @@ bool Player::CanMove(float toX, float toY)
 	rect.x += toX;
 	rect.y += toY;
 
-	// Damage 계산은 Enemy / Bullet 쪽에서
-	CollisionResult result = level->CheckCollision(this, rect);
+	CollisionResult result = level->CheckBlockCollision(this, rect);
 	return !result.isBlocked;
 }
 
@@ -261,6 +285,7 @@ void Player::UpdateActionState(float deltaTime)
 
 		if (damagedTimer <= 0.0f)
 		{
+			damagedTimer = damageDuration;
 			actionState = ActionState::None;
 		}
 		break;
@@ -272,7 +297,7 @@ void Player::ShootRockBuster()
 	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
 	{
 		actionState = ActionState::Attack;
-		attackTimer = attackInterval;
+		attackTimer = attackDuration;
 
 		// 20, 11에서만 발사
 		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(isForward ? 20 : 0, 9), Vector2(isForward ? 1 : -1, 0));

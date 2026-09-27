@@ -57,19 +57,19 @@
     <ClCompile Include="Actor\AStarBullet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Enemy.cpp">
+    <ClCompile Include="Actor\Enemy\Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Airman.cpp">
+    <ClCompile Include="Actor\Enemy\Airman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\AirShooter.cpp">
+    <ClCompile Include="Actor\Enemy\AirShooter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HUD\GameHUD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\HornObstacle.cpp">
+    <ClCompile Include="Actor\HornPlatform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Actor\Enemy\Horn.cpp">
@@ -119,19 +119,19 @@
     <ClInclude Include="Actor\AStarBullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Enemy.h">
+    <ClInclude Include="Actor\Enemy\Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Airman.h">
+    <ClInclude Include="Actor\Enemy\Airman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\AirShooter.h">
+    <ClInclude Include="Actor\Enemy\AirShooter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HUD\GameHUD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\HornObstacle.h">
+    <ClInclude Include="Actor\HornPlatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Actor\Enemy\Horn.h">

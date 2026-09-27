@@ -15,7 +15,7 @@ void AirShooter::SetDeployTarget(const Pixel::Vector2& target)
 
     if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
     {
-        deployPath = aStar.FindPath(position, deployTarget, level->GetBlocked() );
+        deployPath = aStar.FindPath(position, deployTarget, level->GetBlocked());
     }
 
     state = AirShooterState::Deploy;
@@ -42,6 +42,8 @@ void AirShooter::Tick(float deltaTime)
     case AirShooterState::Fire:
         posX += direction.x * fireSpeed * deltaTime;
         position.x = static_cast<int>(posX);
+        break;
+    default:
         break;
     }
 }
@@ -77,7 +79,7 @@ void AirShooter::MoveToDeployPosition(float deltaTime)
 
         std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
 
-        CollisionResult result = level->CheckCollision(this, GetBounds());
+        CollisionResult result = level->CheckBlockCollision(this, GetBounds());
    
 
         Vector2 newPosition = GetPosition();

@@ -1,5 +1,5 @@
 #pragma once
-#include <Actor/Enemy.h>
+#include <Actor/Enemy/Enemy.h>
 
 class AStarEnemy : public Enemy
 {

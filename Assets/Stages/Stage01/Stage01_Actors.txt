@@ -1,11 +1,19 @@
 # Type, X, Y, RepeatCountX, RepeatCountY
 Floor,0,90,1,1
 
+#Door,5,10,1,1
+#Door,205,25,1,1
+#Door,75,60,1,1
+#Door,135,40,1,1
+#Door,165,55,1,1
+
 #Platform,10,80,3,1
 #Platform,160,65,4,1
 #Platform,250,136,3,1
 
-HornPlatform,150,20,1,1
+HornPlatform,300,75,1,1
+Horn,300,67,1,1
+Horn,342,67,1,1
 
 #AStarEnemy,290,128,1,1
 

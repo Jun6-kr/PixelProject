@@ -57,7 +57,7 @@ public:
 
 	void UpdateFloatPosition(float deltaTime);
 
-	virtual void OnDamaged(const int damage);
+	virtual void OnDamaged(const int damage) override;
 
 	void BindDamageFunction(HudCallback callback)
 	{ 
@@ -93,7 +93,6 @@ private:
 
 	const Pixel::AnimationClip* jumpAttackAnimation = nullptr;
 
-	int windIndex = 0;
 	const Pixel::AnimationClip* attackAnimation = nullptr;
 
 	int deathIndex = 0;
@@ -114,11 +113,13 @@ private:
 	float gravity = 60.0f;
 
 	// Attack Timer
-	const float attackInterval = 1.0f;
+	const float attackDuration = 1.0f;
 	float attackTimer = 0.0f;
 
 	// Damaged Timer
-	const float damageInterval = 0.4f;
+	bool bIsDamaged = true;
+	const float damageDuration = 2.0f;
 	float damagedTimer = 0.0f;
+	const float damagedInterval = 0.1f;
 };
 
