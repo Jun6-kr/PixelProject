@@ -51,3 +51,4 @@ docs/devlog/
 - [2026-09-08 ~ 2026-09-09](daily/2026-09-09.md) — Airman 보스 패턴, AirShooter, 문과 충돌 구조
 - [2026-09-10](daily/2026-09-10.md)
 - [2026-09-17](daily/2026-09-17.md) — 록맨 모작 전환, QuadTree 충돌, HUD와 Horn 기반 작업
+- [2026-09-24 ~ 2026-09-25](daily/2026-09-25.md) — QuadTree 재구성, Horn/HornPlatform 및 플레이어 피격 효과
