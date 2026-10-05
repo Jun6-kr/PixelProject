@@ -38,29 +38,66 @@ void Airman::OnDamaged(const int damage)
 void Airman::StartPhase1()
 {
 	currentPhase = AirmanPhase::Phase1;
-	phaseTimer = 0.0f;
+	currentState = AnimationState::Attack;
+	SpawnAirShooters();
 }
 
 void Airman::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
 
-	switch (currentPhase)
+	if (phaseTimer > 0)
 	{
-	case AirmanPhase::Phase1:
-		RunPhase1(deltaTime);
-		break;
-	case AirmanPhase::Phase2:
-		RunPhase2(deltaTime);
-		break;
-	case AirmanPhase::Phase3:
-		RunPhase3(deltaTime);
-		break;
+		phaseTimer -= deltaTime;
 	}
+	else
+	{
+		switch (currentPhase)
+		{
+		case AirmanPhase::Phase1:
+			if (isShooterFired)
+			{
+				isShooterFired = false;
+				SpawnAirShooters();
+			}
+			break;
+		case AirmanPhase::Phase2:
+			JxDebug::DebugSystem::Get().Print("Phase2", 0);
 
+			for (AirShooter*& shooter : wind)
+			{
+				if (shooter && shooter->IsActive())
+				{
+					shooter->Fire();
+				}
+			}
+
+
+			if (airShootingCount == maxAirShootingCount)
+			{
+				PlayNextPhase();
+			}
+			else
+			{
+				++airShootingCount;
+				//bIsAirShooterDeployPositionArr.clear();
+				JxDebug::DebugSystem::Get().Print("Shoot again", 0);
+
+				phaseTimer = /*phauseTime*/3.0f;
+				currentPhase = AirmanPhase::Phase1;
+				isShooterFired = true;
+				//StartPhase1();
+			}
+			break;
+		case AirmanPhase::Phase3:
+			break;
+		default:
+			break;
+		}
+	}
 }
 
-void Airman::Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd)
+void Airman::Draw(const Vector2& screenOffset, const Vector2& screenEnd)
 {
 	Vector2 pos = position - screenOffset;
 
@@ -85,49 +122,6 @@ void Airman::Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& scre
 		//break;
 
 	}
-}
-
-void Airman::RunPhase1(float deltaTime)
-{
-	phaseTimer += deltaTime;
-
-	if (!attackExecuted)
-	{
-		if (phaseTimer >= 1.0f)
-		{
-			attackExecuted = true;
-			currentState = AnimationState::Attack;
-			SpawnAirShooters();
-		} 
-
-		return;
-	}
-
-	// 공격 모션 종료
-	if (IsAnimationFinished())
-	{
-		currentPhase = AirmanPhase::Phase2;
-		phaseTimer = 0.0f;
-		attackExecuted = false;
-
-		currentState = AnimationState::Idle;
-	}
-}
-
-void Airman::RunPhase2(float deltaTime)
-{
-	for (AirShooter*& shooter : airShooter)
-	{
-		if (shooter && shooter->IsActive())
-		{
-			shooter->Fire();
-		}
-	}
-}
-
-void Airman::RunPhase3(float deltaTime)
-{
-	currentPhase = AirmanPhase::Phase3;
 }
 
 void Airman::SpawnAirShooters()
@@ -155,15 +149,64 @@ void Airman::SpawnAirShooters()
 
 			int dirX = isForward ? 1 : -1;
 			Vector2 target = spawnPosition + Vector2(deployOffsets[i].x * dirX,	deployOffsets[i].y);
-			JxDebug::DebugSystem::Get().AddBox(target.x, target.y, width, height, 0x0D);
 
 			shooter->SetDeployTarget(target);
-			airShooter.emplace_back(shooter);
+			shooter->SetProjectileIndex(i);
+			shooter->deployCallback = [&](int index) {
+				UpdateProjectileIsLocatedPosition(index);
+			};
+
+			bIsAirShooterDeployPositionArr.emplace_back(false);
+			wind.emplace_back(shooter);
 		}
 	}
 }
 
-bool Airman::IsAnimationFinished()
+void Airman::UpdateProjectileIsLocatedPosition(int projectileIndex)
 {
-	return phaseTimer > phase1Time;
+	if (bIsAirShooterDeployPositionArr.empty())
+	{
+		return;
+	}
+
+	if (projectileIndex >= 0 && projectileIndex < bIsAirShooterDeployPositionArr.size())
+	{
+		JxDebug::DebugSystem::Get().Print("set to true", projectileIndex);
+		bIsAirShooterDeployPositionArr[projectileIndex] = true;
+	}
+
+	bool result = true;
+	for (const bool& isOk : bIsAirShooterDeployPositionArr)
+	{
+		if (!isOk)
+		{
+			result = false;
+			break;
+		}
+	}
+
+	if (result)
+	{
+		JxDebug::DebugSystem::Get().Print("Time to Shoot", 0);
+		PlayNextPhase();
+	}
+}
+
+void Airman::PlayNextPhase()
+{
+	switch (currentPhase)
+	{
+	case AirmanPhase::Phase1:
+		phaseTimer = phauseTime;
+		currentPhase = AirmanPhase::Phase2;
+		break;
+	case AirmanPhase::Phase2:
+		airShootingCount = 0;
+		currentPhase = AirmanPhase::Phase3;
+		break;
+	case AirmanPhase::Phase3:
+		//attackExecuted = false;
+		//StartPhase1();
+		break;
+	}
 }

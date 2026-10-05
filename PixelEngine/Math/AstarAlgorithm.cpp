@@ -102,7 +102,8 @@ namespace Pixel
 
 		const std::vector<Direction> directions =
 		{
-			{ 0, -1, 1 }, { 0, 1, 1 }, { -1, 0, 1 }, { 1, 0, 1 },
+			{ 0, -1, 1.0f }, { 0, 1, 1.0f }, { -1, 0, 1.0f }, { 1, 0, 1.0f },
+			//{ 1, -1, 1.5f }, { 1, 1, 1.0f }, { -1, 1, 1.5f }, { 1, -1, 1.5f },
 		};
 
 		while (!openMap.empty())
@@ -230,7 +231,7 @@ namespace Pixel
 	}
 
 	/// <summary>
-	/// 쿼드타일(4방향) 휴리스틱 계산
+	/// 옥타일(8방향) 휴리스틱 계산
 	/// </summary>
 	/// <param name="current">현재 조사 위치</param>
 	/// <param name="goal">목표 위치</param>

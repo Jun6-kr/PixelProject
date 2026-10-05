@@ -34,7 +34,7 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 	case ProjectileType::AirShooter:
 		def.damage = 4;
 		def.lifeTime = 10;
-		def.speed = 80;
+		def.speed = 60;
 		def.width = 7;
 		def.height = 5;
 		def.blockMask = 0b00100;

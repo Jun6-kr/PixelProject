@@ -34,7 +34,7 @@ namespace Pixel
 		{
 			int x = 0;
 			int y = 0;
-			int cost = 0;
+			float cost = 0;
 		};
 
 		// 그리드 타일의 종류 (열거형)

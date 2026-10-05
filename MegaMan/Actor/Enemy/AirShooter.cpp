@@ -8,13 +8,23 @@ AirShooter::AirShooter()
 {
 }
 
+void AirShooter::SetProjectileIndex(int index)
+{
+    JxDebug::DebugSystem::Get().Print("set index", index);
+    projectileIndex = index;
+}
+
 void AirShooter::SetDeployTarget(const Pixel::Vector2& target)
 {
     deployTarget = target;
     pathIndex = 0;
+    speedPathIndex = 0.0f;
 
     if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
     {
+        aStar.GetScreenWorldPosition(Vector2(level->GetScreenOffsetX(), level->GetScreenOffsetY())
+            , level->GetScreenWidth()
+            , level->GetScreenHeight());
         deployPath = aStar.FindPath(position, deployTarget, level->GetBlocked());
     }
 
@@ -28,8 +38,6 @@ void AirShooter::Fire()
 
 void AirShooter::Tick(float deltaTime)
 {
-    super::Tick(deltaTime);
-
     switch (state)
     {
     case AirShooterState::Deploy:
@@ -50,7 +58,16 @@ void AirShooter::Tick(float deltaTime)
 
 void AirShooter::Draw(const Pixel::Vector2& screenOffset, const Pixel::Vector2& screenEnd)
 {
-    JxDebug::DebugSystem::Get().AddBox(deployTarget.x - screenOffset.x, deployTarget.y - screenOffset.y, width, height, 0x0D);
+    if (!deployPath.empty())
+    {
+        for (int ix = 0; ix < deployPath.size(); ++ix)
+        {
+            JxDebug::DebugSystem::Get().AddBox(deployPath[ix].x - screenOffset.x, deployPath[ix].y - screenOffset.y, width, height, 0x0D);
+        }
+        
+        JxDebug::DebugSystem::Get().AddBox(deployTarget.x - screenOffset.x, deployTarget.y - screenOffset.y, width, height, 0x05);
+    }
+
     super::Draw(screenOffset, screenEnd);
 }
 
@@ -67,31 +84,32 @@ void AirShooter::MoveToDeployPosition(float deltaTime)
         return;
     }
 
-    moveTimer += projectileDef.speed * deltaTime;
+    float speed = projectileDef.speed * deltaTime;
+    speedPathIndex += speed;
+    int tempIndex = static_cast<int>(speedPathIndex);
 
-    while (moveTimer >= 1.0f && pathIndex < deployPath.size() - 1)
+    if (tempIndex >= deployPath.size() - 1)
     {
-        moveTimer -= 1.0f;
-        ++pathIndex;
-
-        posX = static_cast<float>(deployPath[pathIndex].x);
-        posY = static_cast<float>(deployPath[pathIndex].y);
-
-        std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
-
-        CollisionResult result = level->CheckBlockCollision(this, GetBounds());
-   
-
-        Vector2 newPosition = GetPosition();
-        newPosition.x = deployPath[pathIndex].x;
-        newPosition.y = deployPath[pathIndex].y;
-        SetPosition(newPosition);
+        tempIndex = static_cast<int>(deployPath.size() - 1);
     }
 
+    pathIndex = tempIndex;
+
+    Vector2 newPosition = GetPosition();
+    newPosition.x = deployPath[pathIndex].x;
+    newPosition.y = deployPath[pathIndex].y;
+    SetPosition(newPosition);
+    
     if (pathIndex >= deployPath.size() - 1)
     {
-        //pathIndex = 0;
+        pathIndex = 0;
         //SetActive(false);
+
+        if (deployCallback)
+        {
+            JxDebug::DebugSystem::Get().Print("callback", projectileIndex);
+            deployCallback(projectileIndex);
+        }
 
         state = AirShooterState::Standby;
         return;

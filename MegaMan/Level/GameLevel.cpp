@@ -169,6 +169,11 @@ void GameLevel::Tick(float deltaTime)
 		DebugSystem::Get().SetDebugMode(!DebugSystem::Get().IsDebugMode());
 	}
 
+	if (Input::Get().GetKeyDown('T'))
+	{
+		TeleportBoss();
+	}
+
 	if (Input::Get().GetKeyDown('O'))
 	{
 		collisionMode = (collisionMode == CollisionMode::BruteForce)
@@ -610,6 +615,14 @@ void GameLevel::SpawnProjectilePool()
 
 void GameLevel::TeleportBoss()
 {
+	bossEntryState = BossEntryState::EntryRoom;
+	
+	screenXMax = bossRoomCameraX;
+	screenOffsetX = 600;
+	screenOffsetY;
+
+	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
+	game.GetPlayer().lock()->SetPosition(Vector2(660, 90));
 }
 
 void GameLevel::BossPhase2()

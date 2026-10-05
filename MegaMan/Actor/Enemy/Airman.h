@@ -52,25 +52,32 @@ private:
 
 	void SpawnAirShooters();
 
-	bool IsAnimationFinished();
+	void UpdateProjectileIsLocatedPosition(int projectileIndex);
+	void PlayNextPhase();
 
 private:
+	// Animation
 	AirmanPhase currentPhase = AirmanPhase::Phase0;
 	AnimationState currentState = AnimationState::Idle;
-
 	bool isForward = false;
-
-	const float phase1Time = 3.0f;
-	float phaseTimer = 0.0f;
-
-	bool attackExecuted = false;
-
-	std::vector<AirShooter*> airShooter;
 
 	int windIndex = 0;
 	const Pixel::AnimationClip* windAnimtaion = nullptr;
 	const Pixel::AnimationClip* airShooterAnimtaion = nullptr;
 	//const Pixel::AnimationClip* jumpAnimtaion = nullptr;
+
+	// Projectile
+	std::vector<AirShooter*> wind;
+	std::vector<bool> bIsAirShooterDeployPositionArr;
+	bool isShooterFired = false;
+	
+	float phaseTimer = 0.0f;
+	const float phauseTime = 2.0f;
+
+	// Phase
+	int airShootingCount = 0;
+	const int maxAirShootingCount = 3;
+
 
 };
 
