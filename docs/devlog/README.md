@@ -53,3 +53,4 @@ docs/devlog/
 - [2026-09-17](daily/2026-09-17.md) — 록맨 모작 전환, QuadTree 충돌, HUD와 Horn 기반 작업
 - [2026-09-24 ~ 2026-09-25](daily/2026-09-25.md) — QuadTree 재구성, Horn/HornPlatform 및 플레이어 피격 효과
 - [2026-10-04](daily/2026-10-04.md) — Airman Phase 공격 흐름, AirShooter 배치 콜백 및 반복 발사 구조
+- [2026-11-18](daily/2026-11-18.md) — Airman 반복 공격·점프, 체력 HUD 연동, 충돌 판정 통합 및 8방향 A*
