@@ -66,8 +66,9 @@ public:
 
 	Pixel::CollisionResult CheckBlockCollision(Pixel::Actor* requester, Pixel::Rect rect);
 	Pixel::CollisionResult CheckDamageCollision(Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckCollision(Pixel::Actor* requester, Pixel::Rect rect);
 
-	Projectile* ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction);
+	Projectile* ShootProjectile(EProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction);
 
 	inline int& GetScreenOffsetX() { return screenOffsetX; }
 	inline int& GetScreenOffsetY() { return screenOffsetY; }
@@ -105,6 +106,7 @@ private:
 	Pixel::CollisionResult CheckDamageCollisionBruteForce(const Pixel::Actor* requester, Pixel::Rect rect);
 	Pixel::CollisionResult CheckBlockCollisionQuadTree(Pixel::Actor* requester, Pixel::Rect rect);
 	Pixel::CollisionResult CheckDamageCollisionQuadTree(Pixel::Actor* requester, Pixel::Rect rect);
+	Pixel::CollisionResult CheckCollisionQuadTree(Pixel::Actor* requester, Pixel::Rect rect);
 
 	void TeleportBoss();
 	void BossPhase2();

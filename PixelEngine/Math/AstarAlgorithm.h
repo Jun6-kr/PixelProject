@@ -18,9 +18,9 @@ namespace Pixel
 		Vector2 position;
 
 		// 노드의 비용 정보
-		int gCost = 0;		// 현 노드까지 누적 이동 비용 
-		int hCost = 0;		// 휴리스틱, 도착지 까지의 예상 비용
-		int fCost = 0;
+		float gCost = 0;		// 현 노드까지 누적 이동 비용 
+		float hCost = 0;		// 휴리스틱, 도착지 까지의 예상 비용
+		float fCost = 0;
 
 		// 최종 경로를 역추적할 때 사용할 부모 노드
 		AStarNode* parent = nullptr;
@@ -68,7 +68,7 @@ namespace Pixel
 		std::vector<Vector2> ConstructPath(AStarNode* destination);
 
 		// 휴리스틱(추정 비용) 계산 함수
-		int CalculateHeuristic(const Vector2& current, const Vector2& goal) const;
+		float CalculateHeuristic(const Vector2& current, const Vector2& goal) const;
 
 		// Open / Close 목록 검사 함수
 		bool IsInClosedList(int x, int y) const;

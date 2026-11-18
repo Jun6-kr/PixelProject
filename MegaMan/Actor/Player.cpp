@@ -263,7 +263,7 @@ bool Player::CanMove(float toX, float toY)
 	rect.x += toX;
 	rect.y += toY;
 
-	CollisionResult result = level->CheckBlockCollision(this, rect);
+	CollisionResult result = level->CheckCollision(this, rect);
 	return !result.isBlocked;
 }
 
@@ -300,6 +300,6 @@ void Player::ShootRockBuster()
 		attackTimer = attackDuration;
 
 		// 20, 11에서만 발사
-		level->ShootProjectile(ProjectileType::RockBuster, position + Vector2(isForward ? 20 : 0, 9), Vector2(isForward ? 1 : -1, 0));
+		level->ShootProjectile(EProjectileType::RockBuster, position + Vector2(isForward ? 20 : 0, 9), Vector2(isForward ? 1 : -1, 0));
 	}
 }

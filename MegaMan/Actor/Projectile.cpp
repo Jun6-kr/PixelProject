@@ -17,7 +17,7 @@ void Projectile::SetProjectileInfo(ProjectileDefination definition, const Pixel:
 {
 	projectileDef = definition;
 
-	if (projectileDef.type == ProjectileType::RockBuster)
+	if (projectileDef.type == EProjectileType::RockBuster)
 	{
 		actorType = ActorType::RockBuster;
 	}
@@ -54,13 +54,21 @@ void Projectile::Tick(float deltaTime)
 
 	std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
 
-	CollisionResult result = level->CheckBlockCollision(this, GetBounds());
+	CollisionResult result = level->CheckCollision(this, GetBounds());
 	if (result.isDamaged)
 	{
 		result.actor->OnDamaged(projectileDef.damage);
-		SetActive(false);
-		return;
+		posX = 0.0f;
+		posY = 0.0f;
 	}
+
+	if (result.isBlocked)
+	{
+		SetPosition(Vector2::Zero);
+		posX = 0.0f;
+		posY = 0.0f;
+	}
+
 
 	Vector2 newPosition = GetPosition();
 	newPosition.x = static_cast<int>(posX);

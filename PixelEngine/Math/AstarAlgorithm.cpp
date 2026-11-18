@@ -1,4 +1,5 @@
 ﻿#include "AstarAlgorithm.h"
+#include <algorithm>
 
 namespace Pixel
 {
@@ -103,7 +104,7 @@ namespace Pixel
 		const std::vector<Direction> directions =
 		{
 			{ 0, -1, 1.0f }, { 0, 1, 1.0f }, { -1, 0, 1.0f }, { 1, 0, 1.0f },
-			//{ 1, -1, 1.5f }, { 1, 1, 1.0f }, { -1, 1, 1.5f }, { 1, -1, 1.5f },
+			{ 1, -1, 1.5f }, { 1, 1, 1.5f }, { -1, 1, 1.5f }, { -1, -1, 1.5f },
 		};
 
 		while (!openMap.empty())
@@ -147,7 +148,7 @@ namespace Pixel
 					continue;
 				}
 
-				int newGCost = currentNode->gCost + direction.cost;
+				float newGCost = currentNode->gCost + direction.cost;
 
 				AStarNode* openNode = FindOpenNode(newX, newY);
 				if (openNode)
@@ -236,13 +237,18 @@ namespace Pixel
 	/// <param name="current">현재 조사 위치</param>
 	/// <param name="goal">목표 위치</param>
 	/// <returns>휴리스틱 계산값</returns>
-	int AstarAlgorithm::CalculateHeuristic(const Vector2& current, const Vector2& goal) const
+	float AstarAlgorithm::CalculateHeuristic(const Vector2& current, const Vector2& goal) const
 	{
-		Vector2 pos = current - goal;
-		pos.x = std::abs(pos.x);
-		pos.y = std::abs(pos.y);
+		int diffX = std::abs(current.x - goal.x);
+		int diffY = std::abs(current.y - goal.y);
 
-		return (pos.x + pos.y);
+		int diagonalDistanace = (std::min)(diffX, diffY);
+		int straightDistance = (std::max)(diffX, diffY) - diagonalDistanace;
+
+		const float diagonalCost = 1.5f;
+		const float straightCost = 1.0f;
+
+		return diagonalDistanace * diagonalCost + straightDistance * straightCost;
 	}
 
 

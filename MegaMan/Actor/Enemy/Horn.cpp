@@ -47,7 +47,7 @@ void Horn::Tick(float deltaTime)
 
 	std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
 	Rect rect = GetBounds();
-	CollisionResult result = level->CheckDamageCollision(this, rect);
+	CollisionResult result = level->CheckCollision(this, rect);
 	
 	if (result.isDamaged)
 	{

@@ -51,14 +51,9 @@ void AStarBullet::Tick(float deltaTime)
 
 		std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
 
-		CollisionResult result = level->CheckBlockCollision(this, GetBounds());
+		CollisionResult result = level->CheckCollision(this, GetBounds());
 		if (result.isDamaged)
 		{
-			if (!result.actor)
-			{
-				return;
-			}
-
 			astarIndex = 0;
 			result.actor->OnDamaged(projectileDef.damage);
 			SetActive(false);

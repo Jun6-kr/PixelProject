@@ -3,7 +3,7 @@
 #include <Render/AnimationClip.h>
 
 
-enum class ProjectileType
+enum class EProjectileType
 {
 	RockBuster = 0,
 	Astar,
@@ -12,7 +12,7 @@ enum class ProjectileType
 
 struct ProjectileDefination
 {
-	ProjectileType type = ProjectileType::RockBuster;
+	EProjectileType type = EProjectileType::RockBuster;
 
 	const Pixel::AnimationClip* animation = nullptr;
 

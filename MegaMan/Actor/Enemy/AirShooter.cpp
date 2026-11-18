@@ -48,8 +48,21 @@ void AirShooter::Tick(float deltaTime)
         break;
 
     case AirShooterState::Fire:
+    {
         posX += direction.x * fireSpeed * deltaTime;
         position.x = static_cast<int>(posX);
+
+        std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner());
+        Rect rect = GetBounds();
+        CollisionResult result = level->CheckCollision(this, rect);
+        if (result.isBlocked)
+        {
+            std::string str = result.actor->GetActorType() == ActorType::Terrain ? "terrain" : "not terrain";
+            JxDebug::DebugSystem::Get().Print(str, 0);
+
+            SetActive(false);
+        }
+    }
         break;
     default:
         break;
@@ -98,12 +111,15 @@ void AirShooter::MoveToDeployPosition(float deltaTime)
     Vector2 newPosition = GetPosition();
     newPosition.x = deployPath[pathIndex].x;
     newPosition.y = deployPath[pathIndex].y;
+    
     SetPosition(newPosition);
+    posX = static_cast<float>(newPosition.x);
+    posY = static_cast<float>(newPosition.y);
+
     
     if (pathIndex >= deployPath.size() - 1)
     {
         pathIndex = 0;
-        //SetActive(false);
 
         if (deployCallback)
         {

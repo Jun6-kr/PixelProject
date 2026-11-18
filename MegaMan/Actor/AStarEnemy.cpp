@@ -56,6 +56,6 @@ void AStarEnemy::ShootAStar()
 {
 	if (std::shared_ptr<GameLevel> level = Cast<GameLevel>(GetOwner()))
 	{
-		level->ShootProjectile(ProjectileType::Astar, position + Vector2(7, -5), Vector2(0, -1));
+		level->ShootProjectile(EProjectileType::Astar, position + Vector2(7, -5), Vector2(0, -1));
 	}
 }

@@ -65,6 +65,11 @@ void GameLevel::SetInitData(const std::string& path, std::shared_ptr<Player> pla
 
 				boss->StartPhase1();
 			});
+
+		boss->BindDamageFunction([this](int hp)
+		{
+			hud.OnAirmanHpChanged(hp);
+		});
 	}
 
 
@@ -72,9 +77,9 @@ void GameLevel::SetInitData(const std::string& path, std::shared_ptr<Player> pla
 	addRequestedActorList.emplace_back(player);
 
 	GameManager& game = dynamic_cast<GameManager&>(Engine::Get());
-	projectileManager.LoadProjectileDefinition(ProjectileType::RockBuster, game.GetClip("RockBuster"));
-	projectileManager.LoadProjectileDefinition(ProjectileType::AirShooter, game.GetClip("AirShooter"));
-	projectileManager.LoadProjectileDefinition(ProjectileType::Astar, game.GetClip("AStar"));
+	projectileManager.LoadProjectileDefinition(EProjectileType::RockBuster, game.GetClip("RockBuster"));
+	projectileManager.LoadProjectileDefinition(EProjectileType::AirShooter, game.GetClip("AirShooter"));
+	projectileManager.LoadProjectileDefinition(EProjectileType::Astar, game.GetClip("AStar"));
 
 }
 
@@ -98,25 +103,12 @@ void GameLevel::UpdateCamera(float playerWorldX)
 	//screenOffsetX = std::clamp(screenOffsetX, 0, stageData.config.stageWidth - camEnd.x);
 }
 
-CollisionResult GameLevel::CheckBlockCollision(Actor* requester, Rect rect)
+Pixel::CollisionResult GameLevel::CheckCollision(Pixel::Actor* requester, Pixel::Rect rect)
 {
-	if (collisionMode == CollisionMode::BruteForce)
-	{
-		return CheckBlockCollisionBruteForce(requester, rect);
-	}
-	return CheckBlockCollisionQuadTree(requester, rect);
+	return CheckCollisionQuadTree(requester, rect);
 }
 
-Pixel::CollisionResult GameLevel::CheckDamageCollision(Actor* requester, Pixel::Rect rect)
-{
-	if (collisionMode == CollisionMode::BruteForce)
-	{
-		return CheckDamageCollisionBruteForce(requester, rect);
-	}
-	return CheckDamageCollisionQuadTree(requester, rect);
-}
-
-Projectile* GameLevel::ShootProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction)
+Projectile* GameLevel::ShootProjectile(EProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction)
 {
 	return projectileManager.SpwnProjectile(type, position, direction, this);
 }
@@ -461,6 +453,11 @@ void GameLevel::UpdateActiveActors()
 	{
 		bool inView = screenView.Intersects(actor->GetBounds());
 
+		if (actor.get()->GetActorType() == ActorType::Bullet)
+		{
+			continue;
+		}
+
 		if (inView)
 		{
 			actor->SetActive(true);
@@ -589,26 +586,63 @@ CollisionResult GameLevel::CheckDamageCollisionQuadTree(Actor* requester, Rect r
 	return result;
 }
 
+Pixel::CollisionResult GameLevel::CheckCollisionQuadTree(Pixel::Actor* requester, Pixel::Rect rect)
+{
+	CollisionResult result = {};
+	std::vector<Actor*> candidates = quadTree->Query(rect);
+
+	for (Actor* candidate : candidates)
+	{
+		if (requester == candidate)
+		{
+			continue;
+		}
+
+		uint32_t typeMask = static_cast<uint32_t>(requester->GetActorType());
+
+		if (candidate->GetDamageMask() & typeMask)
+		{
+			result.isDamaged = true;
+			result.actor = candidate;
+		}
+
+		if (candidate->GetBlockMask() & typeMask)
+		{
+			result.isBlocked = true;
+			result.actor = candidate;
+
+			candidate->OnCollision(requester);
+		}
+
+		if (nullptr != result.actor)
+		{
+			break;
+		}
+	}
+
+	return result;
+}
+
 void GameLevel::SpawnProjectilePool()
 {
 	for (int ix = 0; ix < 32; ++ix)
 	{
 		std::shared_ptr<Projectile> projectile = SpawnActor<Projectile>();
 		projectile->SetActive(false);
-		projectileManager.RegisterProjectilePool(ProjectileType::RockBuster, projectile);
+		projectileManager.RegisterProjectilePool(EProjectileType::RockBuster, projectile);
 		
 		if (ix < 6)
 		{
 			std::shared_ptr<Projectile> airshooter = SpawnActor<AirShooter>();
 			airshooter->SetActive(false);
-			projectileManager.RegisterProjectilePool(ProjectileType::AirShooter, airshooter);
+			projectileManager.RegisterProjectilePool(EProjectileType::AirShooter, airshooter);
 		}
 
 		if (ix < 10)
 		{
 			std::shared_ptr<Projectile> astar = SpawnActor<AStarBullet>();
 			astar->SetActive(false);
-			projectileManager.RegisterProjectilePool(ProjectileType::Astar, astar);
+			projectileManager.RegisterProjectilePool(EProjectileType::Astar, astar);
 		}
 	}
 }

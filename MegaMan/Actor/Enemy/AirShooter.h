@@ -10,7 +10,7 @@ enum class AirShooterState
 	Fire        // 플레이어 위치를 향해 이동
 };
 
-using DeployCallback = std::function<void(int)>;
+using AirshooterCallback = std::function<void(int)>;
 
 class AirShooter : public Projectile
 {
@@ -31,7 +31,7 @@ private:
 
 public:
 	int projectileIndex = -1;
-	DeployCallback deployCallback;
+	AirshooterCallback deployCallback;
 
 private:
 

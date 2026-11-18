@@ -1,4 +1,5 @@
 #include "ProjectileManager.h"
+#include <System/DebugSystem.h>
 
 using namespace Pixel;
 
@@ -6,14 +7,14 @@ ProjectileManager::ProjectileManager()
 {
 }
 
-void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixel::AnimationClip* animation)
+void ProjectileManager::LoadProjectileDefinition(EProjectileType type, const Pixel::AnimationClip* animation)
 {
 	ProjectileDefination def = {};
 	def.type = type;
 
 	switch (type)
 	{
-	case ProjectileType::RockBuster:
+	case EProjectileType::RockBuster:
 		def.damage = 2;
 		def.lifeTime = -1;
 		def.speed = 100;
@@ -22,7 +23,7 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.blockMask = 0b01100;
 		def.damageMask = 0b01000;
 		break;
-	case ProjectileType::Astar:
+	case EProjectileType::Astar:
 		def.damage = 2;
 		def.lifeTime = 10;
 		def.speed = 70;
@@ -31,7 +32,7 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 		def.blockMask = 0b01010;
 		def.damageMask = 0b10000;
 		break;
-	case ProjectileType::AirShooter:
+	case EProjectileType::AirShooter:
 		def.damage = 4;
 		def.lifeTime = 10;
 		def.speed = 60;
@@ -46,17 +47,18 @@ void ProjectileManager::LoadProjectileDefinition(ProjectileType type, const Pixe
 	projectileDefinitions[type] = def;
 }
 
-void ProjectileManager::RegisterProjectilePool(ProjectileType type, const std::shared_ptr<Projectile>& projectile)
+void ProjectileManager::RegisterProjectilePool(EProjectileType type, const std::shared_ptr<Projectile>& projectile)
 {
 	typePool[type].emplace_back(projectile.get());
 }
 
-Projectile* ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level)
+Projectile* ProjectileManager::SpwnProjectile(EProjectileType type, const Pixel::Vector2& position, const Pixel::Vector2& direction, GameLevel* level)
 {
 	Projectile* projectile = nullptr;
 
 	if (typePool[type].empty())
 	{
+		JxDebug::DebugSystem::Get().Print("pool is empty", 0);
 		return nullptr;
 	}
 	 
@@ -71,6 +73,7 @@ Projectile* ProjectileManager::SpwnProjectile(ProjectileType type, const Pixel::
 	
 	if (!projectile)
 	{
+		JxDebug::DebugSystem::Get().Print("pool is not empty, there is no inactive projectile", 0);
 		return nullptr;
 	}
 
